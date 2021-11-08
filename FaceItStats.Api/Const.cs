@@ -4,6 +4,6 @@
     {
         public static readonly string DefaultCorsPolicy = "DefaultCorsPolicy";
         public static readonly string SignalRHubsPathRoot = "/hubs";
-        public static readonly string ConnectionString = @"DataSource=persistence/db/FaceItDb.db;";
+        public static readonly string ConnectionString = @"DataSource=FaceItDb.db;";
     }
 }
