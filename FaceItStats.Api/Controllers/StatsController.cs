@@ -12,13 +12,11 @@ namespace FaceItStats.Api.Controllers
     public class StatsController : ControllerBase
     {
         private readonly FaceItStatsClient _faceItClient;
-        private readonly EseaClient _eseaClient;
         private readonly FaceitDbContext _faceItDbContext;
 
         public StatsController(FaceitDbContext faceItDbContext)
         {
             _faceItClient = new FaceItStatsClient();
-            _eseaClient = new EseaClient();
             _faceItDbContext = faceItDbContext;
         }
 
