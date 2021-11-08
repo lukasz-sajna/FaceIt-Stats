@@ -17,7 +17,7 @@ namespace FaceItStats.Api.Client
         {
             var client = new RestClient("http://api.faceit.myhosting.info:81/");
 
-            return await client.GetAsync<FaceItResponse>(new RestRequest($"/?n={nickname}", DataFormat.Json));
+            return await client.GetAsync<FaceItResponse>(new RestRequest($"?n={nickname}", DataFormat.Json));
         }
     }
 }
