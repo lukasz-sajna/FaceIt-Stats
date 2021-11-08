@@ -1,10 +1,10 @@
+using FaceItStats.Api.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 
 namespace FaceItStats.Api
@@ -21,15 +21,9 @@ namespace FaceItStats.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDb(Const.ConnectionString);
             services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "FaceIt Stats API",
-                    Version = "v1"
-                });
-            });
+            services.ConfigureSwagger();
 
             services.AddCors(options =>
             {
@@ -57,8 +51,8 @@ namespace FaceItStats.Api
             });
 
             app.UseCors(Const.DefaultCorsPolicy);
-            app.UseSwagger();
-            app.UseSwaggerUI(config => { config.SwaggerEndpoint("/swagger/v1/swagger.json", "FaceIt Stats API v1"); });
+            app.UpdateDatabase();
+            app.UseCustomSwagger();
             app.UseHttpsRedirection();
 
             app.UseRouting();

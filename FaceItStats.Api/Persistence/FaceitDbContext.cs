@@ -9,7 +9,7 @@ namespace FaceItStats.Api.Persistence
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(@"DataSource=persistence/db/FaceItDb.db;");
+            optionsBuilder.UseSqlite(Const.ConnectionString);
         }
     }
 
