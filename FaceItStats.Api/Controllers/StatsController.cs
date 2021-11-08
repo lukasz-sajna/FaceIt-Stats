@@ -3,6 +3,7 @@ using FaceItStats.Api.Helpers;
 using FaceItStats.Api.Persistence;
 using FaceItStats.Api.Persistence.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Controllers
@@ -36,7 +37,9 @@ namespace FaceItStats.Api.Controllers
         [HttpPost("FaceItWebhook")]
         public async Task<IActionResult> FaceItWebhook([FromBody]string body)
         {
-            _faceItDbContext.Add(new FaceitWebhookData(body));
+            var bodyString = JsonConvert.SerializeObject(body);
+
+            _faceItDbContext.Add(new FaceitWebhookData(bodyString));
             await _faceItDbContext.SaveChangesAsync();
 
             return Ok();
