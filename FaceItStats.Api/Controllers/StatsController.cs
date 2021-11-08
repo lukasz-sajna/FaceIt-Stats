@@ -35,7 +35,7 @@ namespace FaceItStats.Api.Controllers
         }
 
         [HttpPost("FaceItWebhook")]
-        public async Task<IActionResult> FaceItWebhook([FromBody]string body)
+        public async Task<IActionResult> FaceItWebhook([FromBody]object body)
         {
             var bodyString = JsonConvert.SerializeObject(body);
 
