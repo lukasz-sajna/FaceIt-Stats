@@ -7,6 +7,11 @@ namespace FaceItStats.Api.Persistence
     {
         public DbSet<FaceitWebhookData> FaceitWebhookData { get; set; }
 
+        public FaceitDbContext(DbContextOptions<FaceitDbContext> options) : base(options)
+        {
+
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite(Const.ConnectionString);
