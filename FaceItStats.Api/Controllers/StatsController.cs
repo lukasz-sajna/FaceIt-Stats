@@ -1,8 +1,10 @@
 ﻿using FaceItStats.Api.Client;
 using FaceItStats.Api.Helpers;
+using FaceItStats.Api.Hubs;
 using FaceItStats.Api.Persistence;
 using FaceItStats.Api.Persistence.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -16,11 +18,13 @@ namespace FaceItStats.Api.Controllers
     {
         private readonly FaceItStatsClient _faceItClient;
         private readonly FaceitDbContext _faceItDbContext;
+        private readonly IHubContext<FaceItStatsHub> _hubContext;
 
-        public StatsController(FaceitDbContext faceItDbContext)
+        public StatsController(FaceitDbContext faceItDbContext, IHubContext<FaceItStatsHub> hubContext)
         {
             _faceItClient = new FaceItStatsClient();
             _faceItDbContext = faceItDbContext;
+            _hubContext = hubContext;
         }
 
         [HttpGet("GetStats")]
@@ -49,6 +53,8 @@ namespace FaceItStats.Api.Controllers
 
             _faceItDbContext.Add(new FaceitWebhookData(bodyString));
             await _faceItDbContext.SaveChangesAsync();
+
+            await _hubContext.Clients.All.SendAsync("match_status_ready");
 
             return Ok();
         }

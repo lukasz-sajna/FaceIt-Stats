@@ -4,6 +4,6 @@ namespace FaceItStats.Api.Hubs
 {
     public interface IFaceItStatsHub
     {
-        Task NotifyFaceItStatsChanged();
+        Task NotifyFaceItStatsChanged(string method);
     }
 }
