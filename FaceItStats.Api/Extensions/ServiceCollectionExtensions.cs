@@ -32,5 +32,12 @@ namespace FaceItStats.Api.Extensions
             using var dbContext = serviceProvider.GetService<FaceitDbContext>();
             dbContext.Database.Migrate();
         }
+
+        public static IServiceCollection ConfigureSignalR(this IServiceCollection services)
+        {
+            services.AddSignalR();
+
+            return services;
+        }
     }
 }

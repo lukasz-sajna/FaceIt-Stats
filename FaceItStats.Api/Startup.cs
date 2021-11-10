@@ -1,4 +1,5 @@
 using FaceItStats.Api.Extensions;
+using FaceItStats.Api.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -22,9 +23,9 @@ namespace FaceItStats.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDb(Const.ConnectionString);
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
             services.ConfigureSwagger();
-
+            services.AddSignalR();
             services.AddCors(options =>
             {
                 options.AddPolicy(Const.DefaultCorsPolicy, corsBuilder => corsBuilder
@@ -59,9 +60,9 @@ namespace FaceItStats.Api
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
+            app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
+                endpoints.MapHub<FaceItStatsHub>($"{Const.SignalRHubsPathRoot}/stats");
             });
         }
     }
