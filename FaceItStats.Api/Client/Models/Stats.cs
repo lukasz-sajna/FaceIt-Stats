@@ -1,7 +1,10 @@
-﻿namespace FaceItStats.Api.Client.Models
+﻿using Newtonsoft.Json;
+
+namespace FaceItStats.Api.Client.Models
 {
     public class Stats
     {
-        public Lifetime lifetime { get; set; }
+        [JsonProperty("lifetime")]
+        public Lifetime Lifetime { get; set; }
     }
 }

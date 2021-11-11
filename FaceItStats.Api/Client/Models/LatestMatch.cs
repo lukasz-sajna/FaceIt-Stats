@@ -5,18 +5,37 @@ namespace FaceItStats.Api.Client.Models
 {
     public class LatestMatch
     {
-        public string team { get; set; }
-        public string teamScore { get; set; }
-        public string map { get; set; }
-        public string kd { get; set; }
+        [JsonProperty("team")]
+        public string Team { get; set; }
+
+        [JsonProperty("teamScore")]
+        public string TeamScore { get; set; }
+
+        [JsonProperty("map")]
+        public string Map { get; set; }
+
+        [JsonProperty("kd")]
+        public string Kd { get; set; }
 
         [JsonProperty("hs")]
-        public Headshot Headshots { get; set; }
-        public string eloDiff { get; set; }
-        public string kills { get; set; }
-        public string death { get; set; }
-        public string result { get; set; }
-        public DateTime createdAt { get; set; }
-        public DateTime updatedAt { get; set; }
+        public Hs Hs { get; set; }
+
+        [JsonProperty("eloDiff")]
+        public string EloDiff { get; set; }
+
+        [JsonProperty("kills")]
+        public string Kills { get; set; }
+
+        [JsonProperty("death")]
+        public string Death { get; set; }
+
+        [JsonProperty("result")]
+        public string Result { get; set; }
+
+        [JsonProperty("createdAt")]
+        public DateTimeOffset CreatedAt { get; set; }
+
+        [JsonProperty("updatedAt")]
+        public DateTimeOffset UpdatedAt { get; set; }
     }
 }
