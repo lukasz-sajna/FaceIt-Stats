@@ -1,5 +1,5 @@
 ﻿using FaceItStats.Api.Client;
-using FaceItStats.Api.Helpers;
+using FaceItStats.Api.Client.Models;
 using FaceItStats.Api.Hubs;
 using FaceItStats.Api.Models;
 using FaceItStats.Api.Persistence;
@@ -7,6 +7,7 @@ using FaceItStats.Api.Persistence.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Controllers
@@ -27,27 +28,23 @@ namespace FaceItStats.Api.Controllers
         }
 
         [HttpGet("GetStats")]
-        public async Task<IActionResult> GetFaceItStats([FromQuery]string nickname, [FromQuery]string template = null)
+        public async Task<IActionResult> GetFaceItStats([FromQuery]string nickname, CancellationToken cancellationToken)
         {
-            var stats = await _faceItClient.GetStatsForNickname(nickname);
+            var stats = await _faceItClient.GetStatsForNickname(nickname, cancellationToken);
+            var userInfo = await _faceItClient.GetUserInfoForNickname(nickname, cancellationToken);
 
-            if(template != null)
-            {
-                return Ok(template.FillTemplate(stats));
-            }
-
-            return Ok(stats);
+            return Ok(stats.ToFaceItStatsResponse(userInfo.PlayerId));
         }
 
         [HttpPost("FaceItWebhook")]
-        public async Task<IActionResult> FaceItWebhook([FromBody]FaceitWebhookModel body)
+        public async Task<IActionResult> FaceItWebhook([FromBody]FaceitWebhookModel body, CancellationToken cancellationToken)
         {
             var bodyString = JsonConvert.SerializeObject(body);
 
             _faceItDbContext.Add(new FaceitWebhookData(bodyString));
-            await _faceItDbContext.SaveChangesAsync();
+            await _faceItDbContext.SaveChangesAsync(cancellationToken);
 
-            await _hubContext.Clients.All.SendAsync(body.Event);
+            await _hubContext.Clients.All.SendAsync(body.Event, body.ThirdPartyId.ToString(), cancellationToken);
 
             return Ok();
         }
