@@ -1,9 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Hubs
 {
     public interface IFaceItStatsHub
     {
-        Task NotifyFaceItStatsChanged(string method);
+        Task NotifyFaceItStatsChangedAsync(string method, object data, CancellationToken cancellationToken);
     }
 }

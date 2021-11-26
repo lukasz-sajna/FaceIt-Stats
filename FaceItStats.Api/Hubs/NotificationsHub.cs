@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Hubs
 {
-    public class FaceItStatsHub : Hub, IFaceItStatsHub
+    public class NotificationsHub : Hub, INotificationsHub
     {
-        public async Task NotifyFaceItStatsChangedAsync(string method, object data, CancellationToken cancellationToken)
+        public async Task SendNotificationAsync(string method, object data, CancellationToken cancellationToken)
         {
             await Clients.All.SendAsync(method, data, cancellationToken);
         }

@@ -63,6 +63,7 @@ namespace FaceItStats.Api
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
                 endpoints.MapHub<FaceItStatsHub>($"{Const.SignalRHubsPathRoot}/faceitStats");
+                endpoints.MapHub<NotificationsHub>($"{Const.SignalRHubsPathRoot}/notifications");
             });
         }
     }
