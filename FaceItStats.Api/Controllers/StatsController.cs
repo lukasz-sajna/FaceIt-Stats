@@ -7,6 +7,7 @@ using FaceItStats.Api.Persistence.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,6 +41,42 @@ namespace FaceItStats.Api.Controllers
         public async Task<IActionResult> FaceItWebhook([FromBody]FaceitWebhookModel body, CancellationToken cancellationToken)
         {
             var bodyString = JsonConvert.SerializeObject(body);
+
+            if (body.Event.Equals("match_object_created"))
+            {
+                _faceItDbContext.Add(new MatchResult(body.Payload.Id));
+            }
+
+
+            if (body.Event.Equals("match_status_ready"))
+            {
+                var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(body.Payload.Id));
+                if(matchResult != null)
+                {
+                    matchResult.MarkAsStarted();
+                }
+            }
+
+
+            if (body.Event.Equals("match_status_cancelled"))
+            {
+                var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(body.Payload.Id));
+                if (matchResult != null)
+                {
+                    matchResult.MarkAsCancelled();
+                }
+            }
+
+
+            if (body.Event.Equals("match_status_finished"))
+            {
+                var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(body.Payload.Id));
+                if (matchResult != null)
+                {
+                    //matchResult.AddResult(true, body.Payload.)
+                    matchResult.MarkAsFinished();
+                }
+            }
 
             _faceItDbContext.Add(new FaceitWebhookData(bodyString));
             await _faceItDbContext.SaveChangesAsync(cancellationToken);

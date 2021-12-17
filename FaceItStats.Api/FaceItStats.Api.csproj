@@ -5,6 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Persistence\Migrations\20211217155326_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217155326_AddedMatchResultTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20211217155405_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217155405_AddedMatchResultTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20211217155435_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217155435_AddedMatchResultTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160116_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160116_AddedMatchResultTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160147_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160147_AddedMatchResultTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160604_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160604_AddedMatchResultTable.Designer.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160727_AddedMatchResultTable.cs" />
+    <Compile Remove="Persistence\Migrations\20211217160727_AddedMatchResultTable.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.21" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.21">

@@ -7,9 +7,15 @@ namespace FaceItStats.Api.Persistence
     {
         public DbSet<FaceitWebhookData> FaceitWebhookData { get; set; }
 
+        public DbSet<MatchResult> MatchResult { get; set; }
+
         public FaceitDbContext(DbContextOptions<FaceitDbContext> options) : base(options)
         {
 
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
