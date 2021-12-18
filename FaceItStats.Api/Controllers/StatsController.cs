@@ -42,6 +42,9 @@ namespace FaceItStats.Api.Controllers
         {
             var bodyString = JsonConvert.SerializeObject(body);
 
+            await _hubContext.Clients.All.SendAsync(body.Event, body.ThirdPartyId.ToString(), cancellationToken);
+
+
             if (body.Event.Equals("match_object_created"))
             {
                 _faceItDbContext.Add(new MatchResult(body.Payload.Id));
@@ -73,15 +76,26 @@ namespace FaceItStats.Api.Controllers
                 var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(body.Payload.Id));
                 if (matchResult != null)
                 {
-                    //matchResult.AddResult(true, body.Payload.)
+                    var user = await _faceItClient.GetUserInfoForNickname("luciusxsein", cancellationToken);
+                    var userId = user.PlayerId;
+
+                    var matchDetails = await _faceItClient.GetMatchDetails(matchResult.MatchId, cancellationToken);
+                    var myFaction = matchDetails.Teams.Faction1.Roster.Any(x => x.PlayerId.Equals(userId)) ? "faction1" : "faction2";
+                    var isWin = matchDetails.Results.Winner.Equals(myFaction);
+
+                    var matchStats = await _faceItClient.GetStatisticOfMatch(matchResult.MatchId, cancellationToken);
+                    var myScore = matchStats.Rounds.FirstOrDefault()
+                        .Teams.FirstOrDefault(x => x.Players.Any(x => x.PlayerId.Equals(userId)))
+                        .Players.FirstOrDefault(x => x.PlayerId.Equals(userId))
+                        .PlayerStats;
+
+                    matchResult.AddResult(isWin, (int)myScore.Kills, decimal.Parse(myScore.KDRatio));
                     matchResult.MarkAsFinished();
                 }
             }
 
             _faceItDbContext.Add(new FaceitWebhookData(bodyString));
             await _faceItDbContext.SaveChangesAsync(cancellationToken);
-
-            await _hubContext.Clients.All.SendAsync(body.Event, body.ThirdPartyId.ToString(), cancellationToken);
 
             return Ok();
         }

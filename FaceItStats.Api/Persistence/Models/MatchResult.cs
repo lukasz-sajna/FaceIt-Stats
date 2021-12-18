@@ -55,9 +55,10 @@ namespace FaceItStats.Api.Persistence.Models
         }
 
         public void MarkAsStarted() => IsStarted = true;
-        public void MarkAsFinished() => IsCancelled = true;
 
-        public void MarkAsCancelled() => IsFinished = true;
+        public void MarkAsFinished() => IsFinished = true;
+
+        public void MarkAsCancelled() => IsCancelled = true;
 
         public void MarkAsSent() => IsResultSent = true;
     }
