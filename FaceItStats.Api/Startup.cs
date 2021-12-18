@@ -26,13 +26,8 @@ namespace FaceItStats.Api
         {
             services.AddDb(Const.ConnectionString);
             services.AddControllers().AddNewtonsoftJson(options =>
-            {
-                // Use the default property (Pascal) casing
-                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-
-                // Configure a custom converter
-                options.SerializerSettings.Converters.Add(new DecimalConverter());
-            });
+             options.UseCamelCasing(true)
+             );
             services.ConfigureSwagger();
             services.AddSignalR();
             services.AddCors(options =>
