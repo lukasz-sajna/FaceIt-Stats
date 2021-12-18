@@ -18,7 +18,7 @@ namespace FaceItStats.Api.Models
         public string Avatar { get; set; }
 
         [JsonProperty("membership")]
-        public Game Membership { get; set; }
+        public string Membership { get; set; }
 
         [JsonProperty("game_player_id")]
         public string GamePlayerId { get; set; }

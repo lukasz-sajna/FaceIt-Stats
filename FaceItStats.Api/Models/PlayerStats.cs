@@ -38,7 +38,8 @@
         public long MvPs { get; set; }
 
         [JsonProperty("K/R Ratio")]
-        public string KRRatio { get; set; }
+        [JsonConverter(typeof(DecimalConverter))]
+        public decimal KRRatio { get; set; }
 
         [JsonProperty("Result")]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -49,6 +50,7 @@
         public long Deaths { get; set; }
 
         [JsonProperty("K/D Ratio")]
-        public string KDRatio { get; set; }
+        [JsonConverter(typeof(DecimalConverter))]
+        public decimal KDRatio { get; set; }
     }
 }

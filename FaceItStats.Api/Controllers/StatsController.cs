@@ -80,16 +80,16 @@ namespace FaceItStats.Api.Controllers
                     var userId = user.PlayerId;
 
                     var matchDetails = await _faceItClient.GetMatchDetails(matchResult.MatchId, cancellationToken);
-                    var myFaction = matchDetails.Teams.Faction1.Roster.Any(x => x.PlayerId.Equals(userId)) ? "faction1" : "faction2";
+                    var myFaction = matchDetails.Teams.Faction1.Roster.Any(x => x.PlayerId.ToString().Equals(userId)) ? "faction1" : "faction2";
                     var isWin = matchDetails.Results.Winner.Equals(myFaction);
 
                     var matchStats = await _faceItClient.GetStatisticOfMatch(matchResult.MatchId, cancellationToken);
                     var myScore = matchStats.Rounds.FirstOrDefault()
-                        .Teams.FirstOrDefault(x => x.Players.Any(x => x.PlayerId.Equals(userId)))
-                        .Players.FirstOrDefault(x => x.PlayerId.Equals(userId))
+                        .Teams.FirstOrDefault(x => x.Players.Any(x => x.PlayerId.ToString().Equals(userId)))
+                        .Players.FirstOrDefault(x => x.PlayerId.ToString().Equals(userId))
                         .PlayerStats;
 
-                    matchResult.AddResult(isWin, (int)myScore.Kills, decimal.Parse(myScore.KDRatio));
+                    matchResult.AddResult(isWin, (int)myScore.Kills, myScore.KDRatio);
                     matchResult.MarkAsFinished();
                 }
             }

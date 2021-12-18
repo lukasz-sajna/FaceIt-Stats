@@ -15,7 +15,7 @@
         public long Version { get; set; }
 
         [JsonProperty("game")]
-        public Game Game { get; set; }
+        public string Game { get; set; }
 
         [JsonProperty("region")]
         public string Region { get; set; }
@@ -75,52 +75,12 @@
         {
             MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
             DateParseHandling = DateParseHandling.None,
+            FloatParseHandling = FloatParseHandling.Decimal,
             Converters =
             {
-                GameConverter.Singleton,
                 new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
             },
         };
     }
-
-    internal class GameConverter : JsonConverter
-    {
-        public override bool CanConvert(Type t) => t == typeof(Game) || t == typeof(Game?);
-
-        public override object ReadJson(JsonReader reader, Type t, object existingValue, JsonSerializer serializer)
-        {
-            if (reader.TokenType == JsonToken.Null) return null;
-            var value = serializer.Deserialize<string>(reader);
-            switch (value)
-            {
-                case "csgo":
-                    return Game.Csgo;
-                case "free":
-                    return Game.Free;
-            }
-            throw new Exception("Cannot unmarshal type Game");
-        }
-
-        public override void WriteJson(JsonWriter writer, object untypedValue, JsonSerializer serializer)
-        {
-            if (untypedValue == null)
-            {
-                serializer.Serialize(writer, null);
-                return;
-            }
-            var value = (Game)untypedValue;
-            switch (value)
-            {
-                case Game.Csgo:
-                    serializer.Serialize(writer, "csgo");
-                    return;
-                case Game.Free:
-                    serializer.Serialize(writer, "free");
-                    return;
-            }
-            throw new Exception("Cannot marshal type Game");
-        }
-
-        public static readonly GameConverter Singleton = new GameConverter();
-    }
+    
 }

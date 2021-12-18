@@ -1,4 +1,5 @@
 using FaceItStats.Api.Extensions;
+using FaceItStats.Api.Helpers;
 using FaceItStats.Api.Hubs;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
 namespace FaceItStats.Api
@@ -23,7 +25,14 @@ namespace FaceItStats.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDb(Const.ConnectionString);
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers().AddNewtonsoftJson(options =>
+            {
+                // Use the default property (Pascal) casing
+                options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+
+                // Configure a custom converter
+                options.SerializerSettings.Converters.Add(new DecimalConverter());
+            });
             services.ConfigureSwagger();
             services.AddSignalR();
             services.AddCors(options =>
