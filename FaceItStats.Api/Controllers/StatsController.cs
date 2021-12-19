@@ -7,6 +7,7 @@ using FaceItStats.Api.Persistence.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Newtonsoft.Json;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -89,7 +90,7 @@ namespace FaceItStats.Api.Controllers
                         .Players.FirstOrDefault(x => x.PlayerId.ToString().Equals(userId))
                         .PlayerStats;
 
-                    matchResult.AddResult(isWin, (int)myScore.Kills, myScore.KDRatio);
+                    matchResult.AddResult(isWin, (int)myScore.Kills, decimal.Parse(myScore.KDRatio.Replace(".", ",")));
                     matchResult.MarkAsFinished();
                 }
             }

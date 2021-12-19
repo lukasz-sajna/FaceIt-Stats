@@ -1,5 +1,6 @@
 ﻿using FaceItStats.Api.Client.Models;
 using FaceItStats.Api.Models;
+using Newtonsoft.Json;
 using RestSharp;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,7 +45,9 @@ namespace FaceItStats.Api.Client
             var client = new RestClient("https://open.faceit.com/data/v4/matches")
             .AddDefaultHeader("Authorization", "Bearer 93ec930c-5e03-418e-b5e6-687168d87f2c");
 
-            return await client.GetAsync<MatchStatistics>(new RestRequest($"/{matchId}/stats", DataFormat.Json), cancellationToken);
+            var response = await client.ExecuteAsync(new RestRequest($"/{matchId}/stats", DataFormat.Json), Method.GET, cancellationToken);
+
+            return JsonConvert.DeserializeObject<MatchStatistics>(response.Content);
         }
     }
 }
