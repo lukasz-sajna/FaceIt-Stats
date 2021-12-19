@@ -13,7 +13,7 @@ namespace FaceItStats.Api.Client
         {
             var client = new RestClient("https://api.satont.ru");
 
-            return await client.GetAsync<FaceItResponse>(new RestRequest($"faceit?nick={nickname}&game=csgo", DataFormat.Json), cancellationToken);
+            return await client.GetAsync<FaceItResponse>(new RestRequest($"faceit?nick={nickname}&game=csgo&timezone=Europe%2FWarsaw", DataFormat.Json), cancellationToken);
         }
 
         public async Task<FaceItResponse> GetLadderInfoForNickname(string nickname)
