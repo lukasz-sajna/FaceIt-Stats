@@ -1,13 +1,14 @@
 using FaceItStats.Api.Extensions;
-using FaceItStats.Api.Helpers;
 using FaceItStats.Api.Hubs;
+using Hangfire;
+using Hangfire.MemoryStorage;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json.Serialization;
 using System.Collections.Generic;
 
 namespace FaceItStats.Api
@@ -30,12 +31,20 @@ namespace FaceItStats.Api
              );
             services.ConfigureSwagger();
             services.AddSignalR();
+            services.AddMediatR(typeof(Startup));
             services.AddCors(options =>
             {
                 options.AddPolicy(Const.DefaultCorsPolicy, corsBuilder => corsBuilder
                      .WithOrigins((new List<string> { "http://localhost:4200", "https://faceit-stats-app.azurewebsites.net" }).ToArray())
                      .AllowAnyMethod().AllowAnyHeader().AllowCredentials()
                 );
+            });
+
+            services.AddHangfire(config =>
+            {
+                config.UseSimpleAssemblyNameTypeSerializer();
+                config.UseRecommendedSerializerSettings();
+                config.UseMemoryStorage();
             });
         }
 
@@ -45,6 +54,7 @@ namespace FaceItStats.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseHangfireDashboard(options: new DashboardOptions { StatsPollingInterval = 5000 });
             }
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -59,6 +69,7 @@ namespace FaceItStats.Api
             app.UpdateDatabase();
             app.UseCustomSwagger();
             app.UseHttpsRedirection();
+            app.UseHangfire();
 
             app.UseRouting();
 
