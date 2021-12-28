@@ -18,6 +18,12 @@ namespace FaceItStats.Api.Persistence.Models
 
         public decimal KdRatio { get; private set; }
 
+        public string ContestId { get; private set; }
+
+        public string FirstOptionId { get; private set; }
+
+        public string SecondOptionId { get; private set; }
+
         [Required]
         public bool IsStarted { get; set; }
 
@@ -52,6 +58,13 @@ namespace FaceItStats.Api.Persistence.Models
             IsWin = isWin;
             Kills = kills;
             KdRatio = kdRatio;
+        }
+
+        public void SetContest(string contestId, string firstOptionId, string secondOptionId)
+        {
+            ContestId = contestId;
+            FirstOptionId = firstOptionId;
+            SecondOptionId = secondOptionId;
         }
 
         public void MarkAsStarted() => IsStarted = true;

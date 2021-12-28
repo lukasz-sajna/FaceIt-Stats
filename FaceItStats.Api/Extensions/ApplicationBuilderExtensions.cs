@@ -1,12 +1,5 @@
-﻿using FaceItStats.Api.Components.Commands;
-using FaceItStats.Api.Helpers;
-using FaceItStats.Api.Middleware;
-using Hangfire;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using System;
 
 namespace FaceItStats.Api.Extensions
 {
@@ -24,25 +17,6 @@ namespace FaceItStats.Api.Extensions
             ServiceCollectionExtensions.MigrateStatisticsDb(serviceScope.ServiceProvider);
 
             return app;
-        }
-
-        public static void UseHangfire(this IApplicationBuilder app)
-        {
-            var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-
-            app.UseHangfireServer(new BackgroundJobServerOptions
-            {
-                Activator = new DependencyJobActivator(serviceScope.ServiceProvider),
-                WorkerCount = Environment.ProcessorCount * 5,
-                Queues = new[] { Queues.ResetStats}
-            });
-
-            GlobalConfiguration.Configuration.UseSerializerSettings(new JsonSerializerSettings
-            { TypeNameHandling = TypeNameHandling.Objects });
-
-            HangFireHelpers.Mediator = serviceScope.ServiceProvider.GetService<IMediator>();
-
-            RecurringJob.AddOrUpdate(() => HangFireHelpers.ResetStats(new ResetStatsCommand()), "0 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time"), Queues.ResetStats);
         }
     }
 }
