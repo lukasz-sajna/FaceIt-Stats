@@ -2,14 +2,16 @@
 using FaceItStats.Api.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace FaceItStats.Api.Persistence.Migrations
 {
     [DbContext(typeof(FaceitDbContext))]
-    partial class FaceitDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211228033329_ExtendedMatchResultModel")]
+    partial class ExtendedMatchResultModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

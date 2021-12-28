@@ -9,6 +9,8 @@ namespace FaceItStats.Api.Persistence
 
         public DbSet<MatchResult> MatchResult { get; set; }
 
+        public DbSet<BetsSettings> BetsSettings { get; set; }
+
         public FaceitDbContext(DbContextOptions<FaceitDbContext> options) : base(options)
         {
 

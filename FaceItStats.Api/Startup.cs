@@ -1,8 +1,6 @@
+using FaceItStats.Api.Configs;
 using FaceItStats.Api.Extensions;
 using FaceItStats.Api.Hubs;
-using Hangfire;
-using Hangfire.MemoryStorage;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -31,7 +29,6 @@ namespace FaceItStats.Api
              );
             services.ConfigureSwagger();
             services.AddSignalR();
-            services.AddMediatR(typeof(Startup));
             services.AddCors(options =>
             {
                 options.AddPolicy(Const.DefaultCorsPolicy, corsBuilder => corsBuilder
@@ -39,13 +36,7 @@ namespace FaceItStats.Api
                      .AllowAnyMethod().AllowAnyHeader().AllowCredentials()
                 );
             });
-
-            services.AddHangfire(config =>
-            {
-                config.UseSimpleAssemblyNameTypeSerializer();
-                config.UseRecommendedSerializerSettings();
-                config.UseMemoryStorage();
-            });
+            services.Configure<Auth>(Configuration.GetSection(nameof(Auth)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +45,6 @@ namespace FaceItStats.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseHangfireDashboard(options: new DashboardOptions { StatsPollingInterval = 5000 });
             }
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -69,7 +59,6 @@ namespace FaceItStats.Api
             app.UpdateDatabase();
             app.UseCustomSwagger();
             app.UseHttpsRedirection();
-            app.UseHangfire();
 
             app.UseRouting();
 
