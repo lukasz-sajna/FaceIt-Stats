@@ -25,6 +25,7 @@ namespace FaceItStats.Api.Controllers
         private readonly FaceitDbContext _faceItDbContext;
         private readonly IHubContext<FaceItStatsHub> _hubContext;
         private readonly SeClient _seClient;
+        private readonly string _token;
 
         public StatsController(FaceitDbContext faceItDbContext, IHubContext<FaceItStatsHub> hubContext, IOptions<Auth> authSettings)
         {
@@ -32,6 +33,7 @@ namespace FaceItStats.Api.Controllers
             _seClient = new SeClient(authSettings.Value.SeToken);
             _faceItDbContext = faceItDbContext;
             _hubContext = hubContext;
+            _token = authSettings.Value.SeToken;
         }
 
         [HttpGet("GetStats")]
@@ -41,6 +43,12 @@ namespace FaceItStats.Api.Controllers
             var userInfo = await _faceItClient.GetUserInfoForNickname(nickname, cancellationToken);
 
             return Ok(stats.ToFaceItStatsResponse(userInfo.PlayerId));
+        }
+
+        [HttpGet("GetToken")]
+        public IActionResult GetToken()
+        {
+            return Ok(_token);
         }
 
         [HttpPost("FaceItWebhook")]
