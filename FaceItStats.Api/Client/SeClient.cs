@@ -1,8 +1,13 @@
 ﻿using FaceItStats.Api.Client.Models;
+using FaceItStats.Api.Hubs;
 using FaceItStats.Api.Models;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Client
@@ -10,45 +15,107 @@ namespace FaceItStats.Api.Client
     public class SeClient
     {
         private readonly RestClient _seClient;
+        private readonly HttpClient _http_client;
 
         private readonly List<ContenstRequest> Contests = new List<ContenstRequest>();
+        private readonly IHubContext<NotificationsHub> _hubContext;
 
-        public SeClient(string token)
+        public SeClient(string token, IHubContext<NotificationsHub> hubContext)
         {
-            _seClient = new RestClient(@"https://api.streamelements.com/kappa/v2/contests/59f8bf5de889a60001e576f3/");
+            _seClient = new RestClient(@"https://api.streamelements.com/kappa/v2/contests/59f8bf5de889a60001e576f3");
             _seClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
             CreateContests();
+            _hubContext = hubContext;
         }
 
         public async Task<ContenstResponse> CreateBet()
         {
-            return await _seClient.PostAsync<ContenstResponse>(new RestRequest().AddJsonBody(GetRandomContest()));
+            var req = new RestRequest
+            {
+                Method = Method.POST,
+                RequestFormat = DataFormat.Json
+            };
+
+            req.AddBody(JsonConvert.SerializeObject(GetRandomContest()));
+
+            return await ExecuteRequestAsync<ContenstResponse>(req);
         }
 
         public async Task<ContenstResponse> StartBet(string contestId)
         {
-            return await _seClient.PutAsync<ContenstResponse>(new RestRequest($"{contestId}", DataFormat.Json));
+            var req = new RestRequest
+            {
+                Method = Method.PUT,
+                RequestFormat = DataFormat.Json,
+                Resource = $"/{contestId}/start"
+            };
+
+            return await ExecuteRequestAsync<ContenstResponse>(req);
         }
 
         public async Task<ContenstResponse> GetBet(string contestId)
         {
-            return await _seClient.GetAsync<ContenstResponse>(new RestRequest($"{contestId}", DataFormat.Json));
+            var req = new RestRequest
+            {
+                Method = Method.GET,
+                RequestFormat = DataFormat.Json,
+                Resource = $"/{contestId}"
+            };
+
+            return await ExecuteRequestAsync<ContenstResponse>(req);
         }
 
         public async Task<string> CancelBet(string contestId)
         {
-            return await _seClient.DeleteAsync<string>(new RestRequest($"{contestId}/close", DataFormat.Json).AddJsonBody(new { id = contestId }));
+            var req = new RestRequest
+            {
+                Method = Method.DELETE,
+                RequestFormat = DataFormat.Json,
+                Resource = $"/{contestId}/close"
+            };
+
+            req.AddBody(JsonConvert.SerializeObject(new { id = contestId }));
+
+            return await ExecuteRequestAsync<string>(req);
         }
 
         public async Task<string> RefundBet(string contestId)
         {
-            return await _seClient.DeleteAsync<string>(new RestRequest($"{contestId}/refund", DataFormat.Json));
-        }
+            var req = new RestRequest
+            {
+                Method = Method.DELETE,
+                RequestFormat = DataFormat.None,
+                Resource = $"/{contestId}/refund"
+            };
+
+            return await ExecuteRequestAsync<string>(req);
+        } 
 
         public async Task<string> PickWinner(string contestId, string winnerId)
         {
+            var req = new RestRequest
+            {
+                Method = Method.PUT,
+                RequestFormat = DataFormat.Json,
+                Resource = $"/{contestId}/winner"
+            };
 
-            return await _seClient.PutAsync<string>(new RestRequest($"{contestId}/winner", DataFormat.Json).AddJsonBody(new { winnerId = winnerId }));
+            req.AddBody(JsonConvert.SerializeObject(new Winner(winnerId)));
+
+            return await ExecuteRequestAsync<string>(req);
+        }
+
+        private async Task<T> ExecuteRequestAsync<T>(RestRequest request)
+        {
+            var response = await _seClient.ExecuteAsync<T>(request);
+
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                await _hubContext.Clients.All.SendAsync("notification", new NotificationData("Stream Elements token expired", NotificationType.Error));
+                throw new Exception();
+            }
+
+            return JsonConvert.DeserializeObject<T>(response.Content);
         }
 
         private ContenstRequest GetRandomContest()
@@ -65,7 +132,7 @@ namespace FaceItStats.Api.Client
                 Title = ContestType.WinLose,
                 MinBet = 10,
                 MaxBet = 10000,
-                Duration = 5,
+                Duration = 1,
                 BotResponses = true,
                 Options = new List<OptionRequest> { new OptionRequest { Title = "Win", Command = "win" }, new OptionRequest { Title = "Lose", Command = "lose" } }
             });
@@ -75,7 +142,7 @@ namespace FaceItStats.Api.Client
                 Title = ContestType.Kd,
                 MinBet = 10,
                 MaxBet = 10000,
-                Duration = 5,
+                Duration = 1,
                 BotResponses = true,
                 Options = new List<OptionRequest> { new OptionRequest { Title = "Over 0.995", Command = "over" }, new OptionRequest { Title = "Under 0.995", Command = "under" } }
             });
@@ -85,7 +152,7 @@ namespace FaceItStats.Api.Client
                 Title = ContestType.Kills,
                 MinBet = 10,
                 MaxBet = 10000,
-                Duration = 5,
+                Duration = 1,
                 BotResponses = true,
                 Options = new List<OptionRequest> { new OptionRequest { Title = "Over 19.5", Command = "over" }, new OptionRequest { Title = "Under 19.5", Command = "under" } }
             });

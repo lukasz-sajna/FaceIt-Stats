@@ -19,7 +19,7 @@ namespace FaceItStats.Api.Controllers
         [HttpPost("Notification/{description}")]
         public async Task<IActionResult> PassNotification(string description, CancellationToken cancellationToken)
         {
-            await _hubContext.Clients.All.SendAsync("notification", new NotificationData(description), cancellationToken);
+            await _hubContext.Clients.All.SendAsync("notification", new NotificationData(description, NotificationType.Success), cancellationToken);
 
             return Ok();
         }
