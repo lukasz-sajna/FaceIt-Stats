@@ -7,7 +7,6 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Client
@@ -15,7 +14,6 @@ namespace FaceItStats.Api.Client
     public class SeClient
     {
         private readonly RestClient _seClient;
-        private readonly HttpClient _http_client;
 
         private readonly List<ContenstRequest> Contests = new List<ContenstRequest>();
         private readonly IHubContext<NotificationsHub> _hubContext;
