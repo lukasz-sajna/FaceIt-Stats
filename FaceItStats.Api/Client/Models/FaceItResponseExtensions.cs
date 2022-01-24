@@ -43,7 +43,7 @@ namespace FaceItStats.Api.Client.Models
                 results[i] = results[i].Trim();
             }
 
-            return results.ToList().Select(result => new LastResult(result)).ToList();
+            return results.ToList().Take(5).Select(result => new LastResult(result)).ToList();
         }
     }
 }
