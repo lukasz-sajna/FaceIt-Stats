@@ -30,7 +30,7 @@ namespace FaceItStats.Api.Client
         {
             var req = new RestRequest
             {
-                Method = Method.POST,
+                Method = Method.Post,
                 RequestFormat = DataFormat.Json
             };
 
@@ -43,7 +43,7 @@ namespace FaceItStats.Api.Client
         {
             var req = new RestRequest
             {
-                Method = Method.PUT,
+                Method = Method.Put,
                 RequestFormat = DataFormat.Json,
                 Resource = $"/{contestId}/start"
             };
@@ -55,7 +55,7 @@ namespace FaceItStats.Api.Client
         {
             var req = new RestRequest
             {
-                Method = Method.GET,
+                Method = Method.Get,
                 RequestFormat = DataFormat.Json,
                 Resource = $"/{contestId}"
             };
@@ -67,7 +67,7 @@ namespace FaceItStats.Api.Client
         {
             var req = new RestRequest
             {
-                Method = Method.DELETE,
+                Method = Method.Delete,
                 RequestFormat = DataFormat.Json,
                 Resource = $"/{contestId}/close"
             };
@@ -81,7 +81,7 @@ namespace FaceItStats.Api.Client
         {
             var req = new RestRequest
             {
-                Method = Method.DELETE,
+                Method = Method.Delete,
                 RequestFormat = DataFormat.None,
                 Resource = $"/{contestId}/refund"
             };
@@ -93,7 +93,7 @@ namespace FaceItStats.Api.Client
         {
             var req = new RestRequest
             {
-                Method = Method.PUT,
+                Method = Method.Put,
                 RequestFormat = DataFormat.Json,
                 Resource = $"/{contestId}/winner"
             };

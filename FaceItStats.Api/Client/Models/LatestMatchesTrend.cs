@@ -9,5 +9,8 @@ namespace FaceItStats.Api.Client.Models
 
         [JsonProperty("extended")]
         public string Extended { get; set; }
+
+        [JsonProperty("score")]
+        public Score Score { get; set; }
     }
 }
