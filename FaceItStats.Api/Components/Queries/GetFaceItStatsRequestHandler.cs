@@ -21,8 +21,10 @@ namespace FaceItStats.Api.Components.Queries
         {
             var stats = await _faceItClient.GetStatsForNickname(request.Nickname, cancellationToken);
             var userInfo = await _faceItClient.GetUserInfoForNickname(request.Nickname, cancellationToken);
+            var latestMatches = await _faceItClient.GetPlayerMatchHistory(userInfo.PlayerId, 5, cancellationToken);
+            var eloHistory = await _faceItClient.GetPlayerMatchEloHistory(userInfo.PlayerId, 10, cancellationToken);
 
-            return stats.ToFaceItStatsResponse(userInfo.PlayerId);
+            return stats.ToFaceItStatsResponse(userInfo.PlayerId, latestMatches, eloHistory);
         }
     }
 }

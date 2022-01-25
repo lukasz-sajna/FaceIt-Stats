@@ -14,6 +14,7 @@ namespace FaceItStats.Api.Models
 
     public class LastResult
     {
+        public string MatchId { get; private set; }
         public bool Win { get; private set; }
         public int Elo { get; private set; }
         public bool IsEloCalculating { get; set; }
@@ -27,6 +28,19 @@ namespace FaceItStats.Api.Models
                 Elo = splittedResult[1].Contains("NaN") ? 0 : int.Parse(splittedResult[1]);
                 IsEloCalculating = splittedResult[1].Contains("NaN");
             }
+        }
+
+        public LastResult(string matchId, bool isWin, bool isEloCalculating)
+        {
+            MatchId = matchId;
+            Win = isWin;
+            IsEloCalculating = isEloCalculating;
+        }
+
+        public void SetElo(int elo)
+        {
+            Elo = elo;
+            IsEloCalculating = false;
         }
     }
 }

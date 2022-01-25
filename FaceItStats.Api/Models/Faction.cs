@@ -26,5 +26,14 @@
 
         [JsonProperty("type")]
         public string Type { get; set; }
+
+        [JsonProperty("team_id")]
+        public Guid TeamId { get; set; }
+
+        [JsonProperty("nickname")]
+        public string Nickname { get; set; }
+
+        [JsonProperty("players")]
+        public List<Player> Players { get; set; }
     }
 }
