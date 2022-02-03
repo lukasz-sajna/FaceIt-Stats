@@ -51,9 +51,12 @@ namespace FaceItStats.Api.Client.Models
                     var currentMatchElo = Convert.ToInt32(eloHistoryArray[matchIndex].Elo);
                     var previousMatchElo = Convert.ToInt32(eloHistoryArray[matchIndex + 1].Elo);
 
-                    var eloDiff = currentMatchElo - previousMatchElo;
+                    if (currentMatchElo >= 0)
+                    {
+                        var eloDiff = currentMatchElo - previousMatchElo;
 
-                    lastResult.SetElo(eloDiff);
+                        lastResult.SetElo(eloDiff);
+                    }
                 }
 
                 lastResults.Add(lastResult);
