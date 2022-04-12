@@ -3,6 +3,7 @@ using FaceItStats.Api.Client.Models;
 using FaceItStats.Api.Models;
 using MediatR;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,8 +22,8 @@ namespace FaceItStats.Api.Components.Queries
         {
             var stats = await _faceItClient.GetStatsForNickname(request.Nickname, cancellationToken);
             var userInfo = await _faceItClient.GetUserInfoForNickname(request.Nickname, cancellationToken);
-            var latestMatches = await _faceItClient.GetPlayerMatchHistory(userInfo.PlayerId, 5, cancellationToken);
-            var eloHistory = await _faceItClient.GetPlayerMatchEloHistory(userInfo.PlayerId, 10, cancellationToken);
+            var latestMatches = await _faceItClient.GetPlayerMatchHistory(userInfo.PlayerId, 10, cancellationToken);
+            var eloHistory = await _faceItClient.GetPlayerMatchEloHistory(userInfo.PlayerId, 15, cancellationToken);
 
             return stats.ToFaceItStatsResponse(userInfo.PlayerId, latestMatches, eloHistory);
         }

@@ -33,9 +33,10 @@ namespace FaceItStats.Api.Client.Models
         private static List<LastResult> ConvertLastResults(PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory, string playerId)
         {
             var lastResults = new List<LastResult>();
-            var eloHistoryArray = eloHistory.ToArray();
+            var matchIdsWithoutElo = latestMatches.Items.Where(x => x.CompetitionType.Equals("hub")).Select(p => p.MatchId).ToList();
+            var eloHistoryArray = eloHistory.Where(x => !matchIdsWithoutElo.Contains(x.MatchId)).ToArray();
 
-            foreach (var result in latestMatches.Items)
+            foreach (var result in latestMatches.Items.Where(x => x.CompetitionId == new Guid("42e160fc-2651-4fa5-9a9b-829199e27adb")))
             {
                 var myFaction = result.Teams.Faction1.Players.Any(x => x.PlayerId.ToString().Equals(playerId)) ? "faction1" : "faction2";
                 var isWin = result.Results.Winner.Equals(myFaction);
@@ -62,7 +63,7 @@ namespace FaceItStats.Api.Client.Models
                 lastResults.Add(lastResult);
             }
 
-            return lastResults;
+            return lastResults.Take<LastResult>(5).ToList();
         }
     }
 }
