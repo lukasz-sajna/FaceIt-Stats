@@ -33,7 +33,13 @@ namespace FaceItStats.Api.Client.Models
         private static List<LastResult> ConvertLastResults(PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory, string playerId)
         {
             var lastResults = new List<LastResult>();
-            var matchIdsWithoutElo = latestMatches.Items.Where(x => x.CompetitionType.Equals("hub")).Select(p => p.MatchId).ToList();
+
+            var excludedCompetitions = new List<string>
+            {
+                "naajs-"
+            };
+
+            var matchIdsWithoutElo = latestMatches.Items.Where(x => excludedCompetitions.Contains(x.CompetitionName)).Select(p => p.MatchId).ToList();
             var eloHistoryArray = eloHistory.Where(x => !matchIdsWithoutElo.Contains(x.MatchId)).ToArray();
 
             foreach (var result in latestMatches.Items.Where(x => x.CompetitionId == new Guid("42e160fc-2651-4fa5-9a9b-829199e27adb")))
