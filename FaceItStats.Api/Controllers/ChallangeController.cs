@@ -2,14 +2,14 @@
 {
     using FaceItStats.Api.Components.Commands;
     using FaceItStats.Api.Components.Queries;
-    using FaceItStats.Api.Hubs;
     using FaceItStats.Api.Models;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.SignalR;
     using System.Threading;
     using System.Threading.Tasks;
 
+    [Route("api/[controller]")]
+    [ApiController]
     public class ChallangeController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -19,16 +19,16 @@
             _mediator = mediator;
         }
 
-        [HttpGet("challange")]
+        [HttpGet]
         public async Task<IActionResult> GetChallangeData(CancellationToken cancellationToken)
         {
             return Ok(await _mediator.Send(new GetChallangeDataRequest(), cancellationToken));
         }
 
-        [HttpPost("challange")]
-        public async Task<IActionResult> UpdateChallangeData([FromBody] ChallangeData challange, CancellationToken cancellationToken)
+        [HttpPost]
+        public async Task<IActionResult> UpdateChallangeData([FromQuery] int rank, int wins, int draws, int loses, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new UpdateChallangeDataRequest(challange), cancellationToken);
+            await _mediator.Send(new UpdateChallangeDataRequest(new ChallangeData(rank, wins, draws, loses)), cancellationToken);
 
             return Ok();
         }

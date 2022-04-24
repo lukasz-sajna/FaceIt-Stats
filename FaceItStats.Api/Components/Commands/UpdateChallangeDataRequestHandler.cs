@@ -11,9 +11,9 @@
     public class UpdateChallangeDataRequestHandler : IRequestHandler<UpdateChallangeDataRequest>
     {
         private readonly FaceitDbContext dbContext;
-        private readonly IHubContext<ChallangeHub> hubContext;
+        private readonly IHubContext<NotificationsHub> hubContext;
 
-        public UpdateChallangeDataRequestHandler(FaceitDbContext dbContext, IHubContext<ChallangeHub> hubContext)
+        public UpdateChallangeDataRequestHandler(FaceitDbContext dbContext, IHubContext<NotificationsHub> hubContext)
         {
             this.dbContext = dbContext;
             this.hubContext = hubContext;

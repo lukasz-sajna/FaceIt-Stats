@@ -38,7 +38,7 @@
                 await dbContext.SaveChangesAsync(cancellationToken);
             }
 
-            return new ChallangeData { Rank = statsRow.Rank, Wins = statsRow.Wins, Draws = statsRow.Draws, Loses = statsRow.Loses };
+            return new ChallangeData(statsRow.Rank, statsRow.Wins, statsRow.Draws, statsRow.Loses);
         }
     }
 }
