@@ -12,7 +12,7 @@
     {
         public async Task<FaceItResponse> GetStatsForNickname(string nickname, CancellationToken cancellationToken)
         {
-            var client = new RestClient("https://api.satont.ru");
+            var client = new RestClient("https://api.satont.dev");
 
             return await client.GetAsync<FaceItResponse>(new RestRequest($"faceit?nick={nickname}&game=csgo&timezone=Europe%2FWarsaw", (Method)DataFormat.Json), cancellationToken);
         }
