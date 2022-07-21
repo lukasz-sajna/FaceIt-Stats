@@ -1,21 +1,23 @@
-﻿using FaceItStats.Api.Client;
-using FaceItStats.Api.Client.Models;
-using FaceItStats.Api.Models;
-using MediatR;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace FaceItStats.Api.Components.Queries
+﻿namespace FaceItStats.Api.Components.Queries
 {
+    using FaceItStats.Api.Client;
+    using FaceItStats.Api.Client.Models;
+    using FaceItStats.Api.Configs;
+    using FaceItStats.Api.Models;
+    using MediatR;
+    using Microsoft.Extensions.Options;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class GetFaceItStatsRequestHandler : IRequestHandler<GetFaceItStatsRequest, FaceItStatsResponse>
     {
         private readonly FaceItStatsClient _faceItClient;
+        private readonly ExcludedCompetitions _excludedCompetitions;
 
-        public GetFaceItStatsRequestHandler()
+        public GetFaceItStatsRequestHandler(IOptions<ExcludedCompetitions> excludedCompetitionsOptions)
         {
             _faceItClient = new FaceItStatsClient();
+            _excludedCompetitions = excludedCompetitionsOptions.Value;
         }
 
         public async Task<FaceItStatsResponse> Handle(GetFaceItStatsRequest request, CancellationToken cancellationToken)
@@ -25,7 +27,7 @@ namespace FaceItStats.Api.Components.Queries
             var latestMatches = await _faceItClient.GetPlayerMatchHistory(userInfo.PlayerId, 10, cancellationToken);
             var eloHistory = await _faceItClient.GetPlayerMatchEloHistory(userInfo.PlayerId, 15, cancellationToken);
 
-            return stats.ToFaceItStatsResponse(userInfo.PlayerId, latestMatches, eloHistory);
+            return stats.ToFaceItStatsResponse(userInfo.PlayerId, latestMatches, eloHistory, _excludedCompetitions.Names);
         }
     }
 }

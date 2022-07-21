@@ -41,6 +41,7 @@ namespace FaceItStats.Api
                      .AllowAnyMethod().AllowAnyHeader().AllowCredentials()
                 );
             });
+            services.Configure<ExcludedCompetitions>(Configuration.GetSection(nameof(ExcludedCompetitions)));
             services.AddHangfire(configuration =>
             {
                 configuration.UseSimpleAssemblyNameTypeSerializer();

@@ -7,7 +7,7 @@ namespace FaceItStats.Api.Client.Models
 {
     public static class FaceItResponseExtensions
     {
-        public static FaceItStatsResponse ToFaceItStatsResponse(this FaceItResponse response, string playerId, PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory)
+        public static FaceItStatsResponse ToFaceItStatsResponse(this FaceItResponse response, string playerId, PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory, List<string> excludedCompetitions)
         {
             return new FaceItStatsResponse
             {
@@ -16,7 +16,7 @@ namespace FaceItStats.Api.Client.Models
                 Elo = (int)response.Elo,
                 IsEloCalculating = response.TodayEloDiff.Contains("NaN"),
                 EloDiff = ConvertEloDiff(response.TodayEloDiff),
-                LastResults = ConvertLastResults(latestMatches, eloHistory, playerId)
+                LastResults = ConvertLastResults(latestMatches, eloHistory, playerId, excludedCompetitions)
             };
         }        
 
@@ -30,19 +30,14 @@ namespace FaceItStats.Api.Client.Models
             return int.Parse(eloDiff);
         }
 
-        private static List<LastResult> ConvertLastResults(PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory, string playerId)
+        private static List<LastResult> ConvertLastResults(PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory, string playerId, List<string> excludedCompetitions)
         {
             var lastResults = new List<LastResult>();
-
-            var excludedCompetitions = new List<string>
-            {
-                "naajs-"
-            };
 
             var matchIdsWithoutElo = latestMatches.Items.Where(x => excludedCompetitions.Contains(x.CompetitionName)).Select(p => p.MatchId).ToList();
             var eloHistoryArray = eloHistory.Where(x => !matchIdsWithoutElo.Contains(x.MatchId)).ToArray();
 
-            foreach (var result in latestMatches.Items.Where(x => x.CompetitionId == new Guid("42e160fc-2651-4fa5-9a9b-829199e27adb")))
+            foreach (var result in latestMatches.Items.Where(x => !matchIdsWithoutElo.Contains(x.MatchId)))
             {
                 var myFaction = result.Teams.Faction1.Players.Any(x => x.PlayerId.ToString().Equals(playerId)) ? "faction1" : "faction2";
                 var isWin = result.Results.Winner.Equals(myFaction);
