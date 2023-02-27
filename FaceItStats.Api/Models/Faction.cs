@@ -28,7 +28,7 @@
         public string Type { get; set; }
 
         [JsonProperty("team_id")]
-        public Guid TeamId { get; set; }
+        public string TeamId { get; set; }
 
         [JsonProperty("nickname")]
         public string Nickname { get; set; }

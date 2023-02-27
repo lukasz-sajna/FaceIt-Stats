@@ -28,7 +28,7 @@ namespace FaceItStats.Api.Controllers
         [HttpGet("GetStats")]
         public async Task<IActionResult> GetFaceItStats([FromQuery]string nickname, CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new GetFaceItStatsRequest(nickname)));
+            return Ok(await _mediator.Send(new GetFaceItStatsRequest(nickname), cancellationToken));
         }
 
         [HttpPost("FaceItWebhook")]
