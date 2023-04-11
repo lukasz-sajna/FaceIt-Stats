@@ -51,6 +51,7 @@ namespace FaceItStats.Api
             }
             );
             services.Configure<Auth>(Configuration.GetSection(nameof(Auth)));
+            services.Configure<Test>(Configuration.GetSection(nameof(Test)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
