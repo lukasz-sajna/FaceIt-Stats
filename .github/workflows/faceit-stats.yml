@@ -1,5 +1,6 @@
 name: Build and deploy .NET Core app to Windows WebApp faceit-stats
 on:
+  workflow_dispatch:  
   push:
     branches:
     - main
