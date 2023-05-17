@@ -16,7 +16,8 @@ namespace FaceItStats.Api.Client.Models
                 Elo = (int)response.Elo,
                 IsEloCalculating = response.TodayEloDiff.Contains("NaN"),
                 EloDiff = ConvertEloDiff(response.TodayEloDiff),
-                LastResults = ConvertLastResults(latestMatches, eloHistory, playerId, excludedCompetitions)
+                LastResults = ConvertLastResults(latestMatches, eloHistory, playerId, excludedCompetitions),
+                CurrentMatchElo = new CurrentMatchElo(response.CurrentMatch.Gain, response.CurrentMatch.Lose)
             };
         }        
 

@@ -14,10 +14,10 @@
         private readonly FaceItStatsClient _faceItClient;
         private readonly ExcludedCompetitions _excludedCompetitions;
 
-        public GetFaceItStatsRequestHandler(IOptions<ExcludedCompetitions> excludedCompetitionsOptions)
+        public GetFaceItStatsRequestHandler(IOptions<ExcludedCompetitions> excludedCompetitionsOptions, IOptions<ThirdPartyApis> thirdPartyApisOptions)
         {
-            _faceItClient = new FaceItStatsClient();
             _excludedCompetitions = excludedCompetitionsOptions.Value;
+            _faceItClient = new FaceItStatsClient(thirdPartyApisOptions.Value);
         }
 
         public async Task<FaceItStatsResponse> Handle(GetFaceItStatsRequest request, CancellationToken cancellationToken)

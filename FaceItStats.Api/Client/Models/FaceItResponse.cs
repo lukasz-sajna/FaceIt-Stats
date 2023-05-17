@@ -15,6 +15,9 @@ namespace FaceItStats.Api.Client.Models
         [JsonProperty("todayEloDiff")]
         public string TodayEloDiff { get; set; }
 
+        [JsonProperty("currentMatch")]
+        public CurrentMatch CurrentMatch { get; set; }
+
         [JsonProperty("latestMatchesTrend")]
         public LatestMatchesTrend LatestMatchesTrend { get; set; }
 

@@ -1,49 +1,74 @@
 name: Build and deploy .NET Core app to Windows WebApp faceit-stats
 on:
-  workflow_dispatch:  
+  workflow_dispatch:
   push:
     branches:
-    - main
+      - main
 env:
   AZURE_WEBAPP_NAME: faceit-stats
-  AZURE_WEBAPP_PACKAGE_PATH: FaceItStats.Api/publish
+  AZURE_WEBAPP_PACKAGE_PATH: '.'
   AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.faceit_stats_34ca }}
-  CONFIGURATION: Release
   DOTNET_CORE_VERSION: 6.0.x
   WORKING_DIRECTORY: FaceItStats.Api
 jobs:
-  build-and-deploy:
-    runs-on: windows-latest
+  build:
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
-    - name: Restore
-      run: dotnet restore "${{ env.WORKING_DIRECTORY }}"
-    - name: Build
-      run: dotnet build "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-restore
-    - name: Test
-      run: dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
-    - name: Publish
-      run: dotnet publish "${{ env.WORKING_DIRECTORY }}" --configuration ${{ env.CONFIGURATION }} --no-build --output "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+      - uses: actions/checkout@v3
 
-    - name: App Settings Variable Substitution
-      uses: microsoft/variable-substitution@v1
-      with:
-        files: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/appsettings.json'
-      env:
-        Test.TestValue: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
-    - name: Deploy to Azure WebApp
-      uses: azure/webapps-deploy@v2
-      with:
-        app-name: ${{ env.AZURE_WEBAPP_NAME }}
-        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-        publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
-    - name: Publish Artifacts
-      uses: actions/upload-artifact@v1.0.0
-      with:
-        name: webapp
-        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+      - name: Set up dependency caching for faster builds
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/${{env.AZURE_WEBAPP_NAME}}
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v3
+        with:
+          name: .net-app
+          path: ${{env.DOTNET_ROOT}}/${{env.AZURE_WEBAPP_NAME}}
+
+  deploy:
+     runs-on: ubuntu-latest
+     environment:
+        name: 'Production'
+        url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+     needs: build
+
+     steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v3
+        with:
+          name: .net-app
+
+      - name: App Settings Variable Substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+            files: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/appsettings.json'
+        env:
+            ThirdPartyApis.SatontApi.Url: ${{ var.SATONT_API_URL }}
+            ThirdPartyApis.FaceItApi.Url: ${{ var.FACEIT_API_URL }}
+            ThirdPartyApis.FaceItApi.Token: ${{ secrets.FACEIT_API_TOKEN }}
+
+      - name: Deploy to Azure WebApp
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+            app-name: ${{ env.AZURE_WEBAPP_NAME }}
+            package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+            publish-profile: ${{ env.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+

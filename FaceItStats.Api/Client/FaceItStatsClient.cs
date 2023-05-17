@@ -1,6 +1,7 @@
 ﻿namespace FaceItStats.Api.Client
 {
     using FaceItStats.Api.Client.Models;
+    using FaceItStats.Api.Configs;
     using FaceItStats.Api.Models;
     using Newtonsoft.Json;
     using RestSharp;
@@ -10,9 +11,16 @@
 
     public class FaceItStatsClient
     {
+        private readonly ThirdPartyApis _thirdPartyApis;
+
+        public FaceItStatsClient(ThirdPartyApis thirdPartyApis)
+        {
+            _thirdPartyApis = thirdPartyApis;
+        }
+
         public async Task<FaceItResponse> GetStatsForNickname(string nickname, CancellationToken cancellationToken)
         {
-            var client = new RestClient("https://api.satont.dev");
+            var client = new RestClient(_thirdPartyApis.satontApi.Url);
 
             return await client.GetAsync<FaceItResponse>(new RestRequest($"faceit?nick={nickname}&game=csgo&timezone=Europe%2FWarsaw", (Method)DataFormat.Json), cancellationToken);
         }
@@ -26,8 +34,8 @@
 
         public async Task<FaceItUserResponse> GetUserInfoForNickname(string nickname, CancellationToken cancellationToken)
         {
-            var client = new RestClient("https://open.faceit.com/data/v4/players")
-            .AddDefaultHeader("Authorization", "Bearer 93ec930c-5e03-418e-b5e6-687168d87f2c");
+            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/players")
+            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
 
             var response = await client.ExecuteAsync(new RestRequest($"?nickname={nickname}&game=csgo", (Method)DataFormat.Json), Method.Get, cancellationToken);
 
@@ -36,8 +44,8 @@
 
         public async Task<MatchDetails> GetMatchDetails(string matchId, CancellationToken cancellationToken)
         {
-            var client = new RestClient("https://open.faceit.com/data/v4/matches")
-            .AddDefaultHeader("Authorization", "Bearer 93ec930c-5e03-418e-b5e6-687168d87f2c");
+            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/matches")
+            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
 
             return await client.GetAsync<MatchDetails>(new RestRequest($"/{matchId}", (Method)DataFormat.Json), cancellationToken);
         }
@@ -45,8 +53,8 @@
 
         public async Task<MatchStatistics> GetStatisticOfMatch(string matchId, CancellationToken cancellationToken)
         {
-            var client = new RestClient("https://open.faceit.com/data/v4/matches")
-            .AddDefaultHeader("Authorization", "Bearer 93ec930c-5e03-418e-b5e6-687168d87f2c");
+            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/matches")
+            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
 
             var response = await client.ExecuteAsync(new RestRequest($"/{matchId}/stats", (Method)DataFormat.Json), Method.Get, cancellationToken);
 
@@ -55,8 +63,8 @@
 
         public async Task<PlayerMatchHistory> GetPlayerMatchHistory(string playerId, int limit, CancellationToken cancellationToken)
         {
-            var client = new RestClient("https://open.faceit.com/data/v4/players")
-            .AddDefaultHeader("Authorization", "Bearer 93ec930c-5e03-418e-b5e6-687168d87f2c");
+            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/players")
+            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
 
             var response = await client.ExecuteAsync(new RestRequest($"/{playerId}/history?game=csgo&offset=0&limit={limit}", (Method)DataFormat.Json), Method.Get, cancellationToken);
 

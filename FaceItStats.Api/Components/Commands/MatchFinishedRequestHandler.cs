@@ -22,11 +22,11 @@ namespace FaceItStats.Api.Components.Commands
         private readonly FaceitDbContext _faceItDbContext;
         private readonly FaceItStatsClient _faceItClient;
 
-        public MatchFinishedRequestHandler(FaceitDbContext faceItDbContext, IOptions<Auth> authSettings, IHubContext<NotificationsHub> hubContext)
+        public MatchFinishedRequestHandler(FaceitDbContext faceItDbContext, IOptions<Auth> authSettings, IHubContext<NotificationsHub> hubContext, IOptions<ThirdPartyApis> thirdPartyApisOptions)
         {
             _faceItDbContext = faceItDbContext;
             _seClient = new SeClient(authSettings.Value.SeToken, hubContext);
-            _faceItClient = new FaceItStatsClient();
+            _faceItClient = new FaceItStatsClient(thirdPartyApisOptions.Value);
         }
 
         public async Task<Unit> Handle(MatchFinishedRequest request, CancellationToken cancellationToken)

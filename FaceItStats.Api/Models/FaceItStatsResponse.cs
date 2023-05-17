@@ -10,6 +10,19 @@ namespace FaceItStats.Api.Models
         public int EloDiff { get; set; }
         public bool IsEloCalculating { get; set; }
         public List<LastResult> LastResults { get; set; }
+        public CurrentMatchElo CurrentMatchElo { get; set; }
+    }
+
+    public class CurrentMatchElo
+    {
+        public int Gain { get; private set; }
+        public int Loss { get; private set; }
+
+        public CurrentMatchElo(int gain, int loss)
+        {
+            Gain = gain;
+            Loss = loss;
+        }
     }
 
     public class LastResult
