@@ -59,8 +59,8 @@ jobs:
         with:
             files: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/appsettings.json'
         env:
-            ThirdPartyApis.SatontApi.Url: ${{ var.SATONT_API_URL }}
-            ThirdPartyApis.FaceItApi.Url: ${{ var.FACEIT_API_URL }}
+            ThirdPartyApis.SatontApi.Url: ${{ vars.SATONT_API_URL }}
+            ThirdPartyApis.FaceItApi.Url: ${{ vars.FACEIT_API_URL }}
             ThirdPartyApis.FaceItApi.Token: ${{ secrets.FACEIT_API_TOKEN }}
 
       - name: Deploy to Azure WebApp
