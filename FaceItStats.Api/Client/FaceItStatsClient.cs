@@ -28,6 +28,8 @@
         public async Task<FaceItResponse> GetLadderInfoForNickname(string nickname)
         {
             var client = new RestClient("http://api.faceit.myhosting.info:81/");
+            //3
+            //2
 
             return await client.GetAsync<FaceItResponse>(new RestRequest($"?n={nickname}", (Method)DataFormat.Json));
         }
