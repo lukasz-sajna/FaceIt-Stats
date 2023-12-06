@@ -13,16 +13,10 @@ namespace FaceItStats.Api.Models
         public CurrentMatchElo CurrentMatchElo { get; set; }
     }
 
-    public class CurrentMatchElo
+    public class CurrentMatchElo(int gain, int loss)
     {
-        public int Gain { get; private set; }
-        public int Loss { get; private set; }
-
-        public CurrentMatchElo(int gain, int loss)
-        {
-            Gain = gain;
-            Loss = loss;
-        }
+        public int Gain { get; private set; } = gain;
+        public int Loss { get; private set; } = loss;
     }
 
     public class LastResult
@@ -35,6 +29,7 @@ namespace FaceItStats.Api.Models
         public LastResult(string result)
         {
             var splittedResult = result.Split(" ");
+
             if(splittedResult.Length == 2)
             {
                 Win = splittedResult[0].Equals("W");

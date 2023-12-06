@@ -9,11 +9,9 @@ namespace FaceItStats.Api.Client.Models
         [JsonConverter(typeof(ParseStringConverter))]
         public long CurrentWinStreak { get; set; }
 
-        [JsonProperty("Matches")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Matches { get; set; }
 
-        [JsonProperty("Wins")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Wins { get; set; }
 
@@ -26,7 +24,7 @@ namespace FaceItStats.Api.Client.Models
         public long AverageHeadshots { get; set; }
 
         [JsonProperty("K/D Ratio")]
-        public string KDRatio { get; set; }
+        public string KdRatio { get; set; }
 
         [JsonProperty("Win Rate %")]
         [JsonConverter(typeof(ParseStringConverter))]
@@ -37,6 +35,6 @@ namespace FaceItStats.Api.Client.Models
         public long LongestWinStreak { get; set; }
 
         [JsonProperty("Average K/D Ratio")]
-        public string AverageKDRatio { get; set; }
+        public string AverageKdRatio { get; set; }
     }
 }

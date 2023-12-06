@@ -14,23 +14,20 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Components.Commands
 {
-    public class MatchCancelledRequestHandler : IRequestHandler<MatchCancelledRequest>
+    public class MatchCancelledRequestHandler(
+        FaceitDbContext faceItDbContext,
+        IOptions<Auth> authSettings,
+        IHubContext<NotificationsHub> hubContext)
+        : IRequestHandler<MatchCancelledRequest>
     {
-        private readonly SeClient _seClient;
-        private readonly FaceitDbContext _faceItDbContext;
+        private readonly SeClient _seClient = SeClient.CreateInstance(authSettings.Value.SeToken, hubContext);
 
-        public MatchCancelledRequestHandler(FaceitDbContext faceItDbContext, IOptions<Auth> authSettings, IHubContext<NotificationsHub> hubContext)
+        public async Task Handle(MatchCancelledRequest request, CancellationToken cancellationToken)
         {
-            _faceItDbContext = faceItDbContext;
-            _seClient = new SeClient(authSettings.Value.SeToken, hubContext);
-        }
+            var betSettings = await faceItDbContext.BetsSettings.FirstOrDefaultAsync(cancellationToken);
+            var isBetsEnabled = betSettings is { IsEnabled: true };
 
-        public async Task<Unit> Handle(MatchCancelledRequest request, CancellationToken cancellationToken)
-        {
-            var betSettings = await _faceItDbContext.BetsSettings.FirstOrDefaultAsync(cancellationToken);
-            var isBetsEnabled = betSettings != null && betSettings.IsEnabled;
-
-            var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(request.MatchId));
+            var matchResult = faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(request.MatchId));
 
             if (matchResult == null)
             {
@@ -51,9 +48,7 @@ namespace FaceItStats.Api.Components.Commands
                 }
             }
 
-            await _faceItDbContext.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
+            await faceItDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

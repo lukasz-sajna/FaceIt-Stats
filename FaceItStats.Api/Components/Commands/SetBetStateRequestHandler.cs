@@ -6,30 +6,21 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Components.Commands
 {
-    public class SetBetStateRequestHandler : IRequestHandler<SetBetStateRequest>
+    public class SetBetStateRequestHandler(FaceitDbContext faceItDbContext) : IRequestHandler<SetBetStateRequest>
     {
-        private readonly FaceitDbContext _faceItDbContext;
-
-        public SetBetStateRequestHandler(FaceitDbContext faceItDbContext)
+        public async Task Handle(SetBetStateRequest request, CancellationToken cancellationToken)
         {
-            _faceItDbContext = faceItDbContext;
-        }
+            var betSettings = faceItDbContext.BetsSettings.FirstOrDefault();
 
-        public async Task<Unit> Handle(SetBetStateRequest request, CancellationToken cancellationToken)
-        {
-            var betSettings = _faceItDbContext.BetsSettings.FirstOrDefault();
-
-            if(betSettings == null)
+            if(betSettings is null)
             {
                 betSettings = new Persistence.Models.BetsSettings { IsEnabled = request.IsEnabled };
-                _faceItDbContext.Add(betSettings);
+                faceItDbContext.Add(betSettings);
             }
 
             betSettings.IsEnabled = request.IsEnabled;
 
-            await _faceItDbContext.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
+            await faceItDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

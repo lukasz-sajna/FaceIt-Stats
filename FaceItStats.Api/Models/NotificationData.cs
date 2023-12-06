@@ -2,18 +2,10 @@
 
 namespace FaceItStats.Api.Models
 {
-    public class NotificationData
+    public class NotificationData(string message, string type)
     {
-        public string Message { get; private set; }
-        public string Type { get; private set; }
-        public DateTime Date { get; private set; }
-
-        public NotificationData(string message, string type)
-        {
-            Message = message;
-            Type = type;
-            Date = DateTime.Now;
-
-        }
+        public string Message { get; private set; } = message;
+        public string Type { get; private set; } = type;
+        public DateTime Date { get; private set; } = DateTime.Now;
     }
 }

@@ -1,15 +1,10 @@
 ﻿namespace FaceItStats.Api.Components.Commands
 {
-    using FaceItStats.Api.Models;
+    using Models;
     using MediatR;
 
-    public class UpdateChallangeDataRequest : IRequest
+    public class UpdateChallengeDataRequest(ChallengeData challengeData) : IRequest
     {
-        public UpdateChallangeDataRequest(ChallangeData challangeData)
-        {
-            this.challange = challangeData;
-        }
-
-        public ChallangeData challange { get; private set; }
+        public ChallengeData Challenge { get; private set; } = challengeData;
     }
 }

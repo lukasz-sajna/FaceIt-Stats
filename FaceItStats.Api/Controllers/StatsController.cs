@@ -14,21 +14,12 @@ namespace FaceItStats.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class StatsController : ControllerBase
+    public class StatsController(IHubContext<FaceItStatsHub> hubContext, ISender mediator) : ControllerBase
     {
-        private readonly IHubContext<FaceItStatsHub> _hubContext;
-        private readonly IMediator _mediator;
-
-        public StatsController(IHubContext<FaceItStatsHub> hubContext, IMediator mediator)
-        {
-            _hubContext = hubContext;
-            _mediator = mediator;
-        }
-
         [HttpGet("GetStats")]
         public async Task<IActionResult> GetFaceItStats([FromQuery]string nickname, CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new GetFaceItStatsRequest(nickname), cancellationToken));
+            return Ok(await mediator.Send(new GetFaceItStatsRequest(nickname), cancellationToken));
         }
 
         [HttpPost("FaceItWebhook")]
@@ -56,13 +47,13 @@ namespace FaceItStats.Api.Controllers
                 BackgroundJob.Enqueue(() => HangFireHelpers.MatchEvent(new MatchFinishedRequest(body.Payload.Id)));
             }
 
-            await _hubContext.Clients.All.SendAsync(body.Event, body.ThirdPartyId.ToString(), cancellationToken);
+            await hubContext.Clients.All.SendAsync(body.Event, body.ThirdPartyId.ToString(), cancellationToken);
 
             return NoContent();
         }
 
         [HttpPost("BetState")]
-        public IActionResult ChangeBetState([FromQuery] bool isEnabled, CancellationToken cancellationToken)
+        public IActionResult ChangeBetState([FromQuery] bool isEnabled)
         {
 
             BackgroundJob.Enqueue(() => HangFireHelpers.SetBetState( new SetBetStateRequest(isEnabled)));
@@ -73,7 +64,7 @@ namespace FaceItStats.Api.Controllers
         [HttpGet("BetState")]
         public async Task<IActionResult> GetBetState(CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new GetBetStateRequest()));
+            return Ok(await mediator.Send(new GetBetStateRequest(), cancellationToken));
         }
     }
 }

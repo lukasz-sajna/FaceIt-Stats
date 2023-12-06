@@ -3,13 +3,8 @@ using MediatR;
 
 namespace FaceItStats.Api.Components.Queries
 {
-    public class GetFaceItStatsRequest : IRequest<FaceItStatsResponse>
+    public class GetFaceItStatsRequest(string nickname) : IRequest<FaceItStatsResponse>
     {
-        public GetFaceItStatsRequest(string nickname)
-        {
-            Nickname = nickname;
-        }
-
-        public string Nickname { get; }
+        public string Nickname { get; } = nickname;
     }
 }

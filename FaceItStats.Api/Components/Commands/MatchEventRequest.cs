@@ -2,13 +2,8 @@
 
 namespace FaceItStats.Api.Components.Commands
 {
-    public class MatchEventRequest : IRequest
+    public class MatchEventRequest(string matchId) : IRequest
     {
-        public string MatchId { get; private set; }
-
-        public MatchEventRequest(string matchId)
-        {
-            MatchId = matchId;
-        }
+        public string MatchId { get; private set; } = matchId;
     }
 }

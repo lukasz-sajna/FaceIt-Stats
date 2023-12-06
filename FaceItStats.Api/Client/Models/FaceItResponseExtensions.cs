@@ -31,7 +31,7 @@ namespace FaceItStats.Api.Client.Models
             return int.Parse(eloDiff);
         }
 
-        private static List<LastResult> ConvertLastResults(PlayerMatchHistory latestMatches, List<PlayerMatchEloHistory> eloHistory, string playerId, List<string> excludedCompetitions)
+        private static List<LastResult> ConvertLastResults(PlayerMatchHistory latestMatches, IEnumerable<PlayerMatchEloHistory> eloHistory, string playerId, ICollection<string> excludedCompetitions)
         {
             var lastResults = new List<LastResult>();
 
@@ -65,7 +65,7 @@ namespace FaceItStats.Api.Client.Models
                 lastResults.Add(lastResult);
             }
 
-            return lastResults.Take<LastResult>(5).ToList();
+            return lastResults.Take(5).ToList();
         }
     }
 }

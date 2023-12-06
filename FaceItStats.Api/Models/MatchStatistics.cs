@@ -3,7 +3,7 @@
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public partial class MatchStatistics
+    public class MatchStatistics
     {
         [JsonProperty("rounds")]
         public List<Round> Rounds { get; set; }

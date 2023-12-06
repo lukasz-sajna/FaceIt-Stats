@@ -1,7 +1,7 @@
-﻿namespace FaceItStats.Api.Models
-{
-    using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
+namespace FaceItStats.Api.Client.Models
+{
     public class OptionResponse
     {
         [JsonProperty("totalAmount")]

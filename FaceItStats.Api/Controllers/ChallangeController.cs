@@ -1,8 +1,8 @@
 ﻿namespace FaceItStats.Api.Controllers
 {
-    using FaceItStats.Api.Components.Commands;
-    using FaceItStats.Api.Components.Queries;
-    using FaceItStats.Api.Models;
+    using Components.Commands;
+    using Components.Queries;
+    using Models;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
     using System.Threading;
@@ -10,25 +10,18 @@
 
     [Route("api/[controller]")]
     [ApiController]
-    public class ChallangeController : ControllerBase
+    public class ChallengeController(ISender mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public ChallangeController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetChallangeData(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetChallengeData(CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new GetChallangeDataRequest(), cancellationToken));
+            return Ok(await mediator.Send(new GetChallengeDataRequest(), cancellationToken));
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateChallangeData([FromQuery] int rank, int wins, int draws, int loses, CancellationToken cancellationToken)
+        public async Task<IActionResult> UpdateChallengeData([FromQuery] int rank, int wins, int draws, int loses, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new UpdateChallangeDataRequest(new ChallangeData(rank, wins, draws, loses)), cancellationToken);
+            await mediator.Send(new UpdateChallengeDataRequest(new ChallengeData(rank, wins, draws, loses)), cancellationToken);
 
             return Ok();
         }

@@ -1,24 +1,21 @@
 ﻿namespace FaceItStats.Api.Components.Queries
 {
-    using FaceItStats.Api.Client;
+    using Client;
     using FaceItStats.Api.Client.Models;
-    using FaceItStats.Api.Configs;
-    using FaceItStats.Api.Models;
+    using Configs;
+    using Models;
     using MediatR;
     using Microsoft.Extensions.Options;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class GetFaceItStatsRequestHandler : IRequestHandler<GetFaceItStatsRequest, FaceItStatsResponse>
+    public class GetFaceItStatsRequestHandler(
+        IOptions<ExcludedCompetitions> excludedCompetitionsOptions,
+        IOptions<ThirdPartyApis> thirdPartyApisOptions)
+        : IRequestHandler<GetFaceItStatsRequest, FaceItStatsResponse>
     {
-        private readonly FaceItStatsClient _faceItClient;
-        private readonly ExcludedCompetitions _excludedCompetitions;
-
-        public GetFaceItStatsRequestHandler(IOptions<ExcludedCompetitions> excludedCompetitionsOptions, IOptions<ThirdPartyApis> thirdPartyApisOptions)
-        {
-            _excludedCompetitions = excludedCompetitionsOptions.Value;
-            _faceItClient = new FaceItStatsClient(thirdPartyApisOptions.Value);
-        }
+        private readonly FaceItStatsClient _faceItClient = new(thirdPartyApisOptions.Value);
+        private readonly ExcludedCompetitions _excludedCompetitions = excludedCompetitionsOptions.Value;
 
         public async Task<FaceItStatsResponse> Handle(GetFaceItStatsRequest request, CancellationToken cancellationToken)
         {
