@@ -2,7 +2,7 @@
 {
     using System.ComponentModel.DataAnnotations;
 
-    public class ChallangeStats
+    public class ChallengeStats
     {
         [Key]
         public int Id { get; set; }

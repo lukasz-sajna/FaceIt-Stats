@@ -15,18 +15,23 @@ namespace FaceItStats.Api.Client
     {
         private readonly RestClient _seClient;
 
-        private readonly List<ContenstRequest> Contests = new List<ContenstRequest>();
+        private readonly List<ContestRequest> _contests = new();
         private readonly IHubContext<NotificationsHub> _hubContext;
 
-        public SeClient(string token, IHubContext<NotificationsHub> hubContext)
+        private SeClient(string token, IHubContext<NotificationsHub> hubContext)
         {
             _seClient = new RestClient(@"https://api.streamelements.com/kappa/v2/contests/59f8bf5de889a60001e576f3");
-            _seClient.AddDefaultHeader("Authorization", string.Format("Bearer {0}", token));
+            _seClient.AddDefaultHeader("Authorization", $"Bearer {token}");
             CreateContests();
             _hubContext = hubContext;
         }
 
-        public async Task<ContenstResponse> CreateBet()
+        public static SeClient CreateInstance(string token, IHubContext<NotificationsHub> hubContext)
+        {
+            return new SeClient(token, hubContext);
+        }
+
+        public Task<ContestResponse> CreateBet()
         {
             var req = new RestRequest
             {
@@ -36,10 +41,10 @@ namespace FaceItStats.Api.Client
 
             req.AddBody(JsonConvert.SerializeObject(GetRandomContest()));
 
-            return await ExecuteRequestAsync<ContenstResponse>(req);
+            return ExecuteRequestAsync<ContestResponse>(req);
         }
 
-        public async Task<ContenstResponse> StartBet(string contestId)
+        public Task<ContestResponse> StartBet(string contestId)
         {
             var req = new RestRequest
             {
@@ -48,10 +53,10 @@ namespace FaceItStats.Api.Client
                 Resource = $"/{contestId}/start"
             };
 
-            return await ExecuteRequestAsync<ContenstResponse>(req);
+            return ExecuteRequestAsync<ContestResponse>(req);
         }
 
-        public async Task<ContenstResponse> GetBet(string contestId)
+        public Task<ContestResponse> GetBet(string contestId)
         {
             var req = new RestRequest
             {
@@ -60,10 +65,10 @@ namespace FaceItStats.Api.Client
                 Resource = $"/{contestId}"
             };
 
-            return await ExecuteRequestAsync<ContenstResponse>(req);
+            return ExecuteRequestAsync<ContestResponse>(req);
         }
 
-        public async Task<string> CancelBet(string contestId)
+        public Task<string> CancelBet(string contestId)
         {
             var req = new RestRequest
             {
@@ -74,10 +79,10 @@ namespace FaceItStats.Api.Client
 
             req.AddBody(JsonConvert.SerializeObject(new { id = contestId }));
 
-            return await ExecuteRequestAsync<string>(req);
+            return ExecuteRequestAsync<string>(req);
         }
 
-        public async Task<string> RefundBet(string contestId)
+        public Task<string> RefundBet(string contestId)
         {
             var req = new RestRequest
             {
@@ -86,10 +91,10 @@ namespace FaceItStats.Api.Client
                 Resource = $"/{contestId}/refund"
             };
 
-            return await ExecuteRequestAsync<string>(req);
+            return ExecuteRequestAsync<string>(req);
         } 
 
-        public async Task<string> PickWinner(string contestId, string winnerId)
+        public Task<string> PickWinner(string contestId, string winnerId)
         {
             var req = new RestRequest
             {
@@ -100,7 +105,7 @@ namespace FaceItStats.Api.Client
 
             req.AddBody(JsonConvert.SerializeObject(new Winner(winnerId)));
 
-            return await ExecuteRequestAsync<string>(req);
+            return ExecuteRequestAsync<string>(req);
         }
 
         private async Task<T> ExecuteRequestAsync<T>(RestRequest request)
@@ -113,46 +118,58 @@ namespace FaceItStats.Api.Client
                 throw new Exception();
             }
 
-            return JsonConvert.DeserializeObject<T>(response.Content);
+            return JsonConvert.DeserializeObject<T>(response.Content!);
         }
 
-        private ContenstRequest GetRandomContest()
+        private ContestRequest GetRandomContest()
         {
-            var index = new Random().Next(Contests.Count);
+            var index = new Random().Next(_contests.Count);
 
-            return Contests[index];
+            return _contests[index];
         }
 
         private void CreateContests()
         {
-            Contests.Add(new ContenstRequest
+            _contests.Add(new ContestRequest
             {
                 Title = ContestType.WinLose,
                 MinBet = 10,
                 MaxBet = 10000,
                 Duration = 1,
                 BotResponses = true,
-                Options = new List<OptionRequest> { new OptionRequest { Title = "Win", Command = "win" }, new OptionRequest { Title = "Lose", Command = "lose" } }
+                Options =
+                [
+                    new OptionRequest { Title = "Win", Command = "win" },
+                    new OptionRequest { Title = "Lose", Command = "lose" }
+                ]
             });
 
-            Contests.Add(new ContenstRequest
+            _contests.Add(new ContestRequest
             {
                 Title = ContestType.Kd,
                 MinBet = 10,
                 MaxBet = 10000,
                 Duration = 1,
                 BotResponses = true,
-                Options = new List<OptionRequest> { new OptionRequest { Title = "Over 0.995", Command = "over" }, new OptionRequest { Title = "Under 0.995", Command = "under" } }
+                Options =
+                [
+                    new() { Title = "Over 0.995", Command = "over" },
+                    new () { Title = "Under 0.995", Command = "under" }
+                ]
             });
 
-            Contests.Add(new ContenstRequest
+            _contests.Add(new ContestRequest
             {
                 Title = ContestType.Kills,
                 MinBet = 10,
                 MaxBet = 10000,
                 Duration = 1,
                 BotResponses = true,
-                Options = new List<OptionRequest> { new OptionRequest { Title = "Over 19.5", Command = "over" }, new OptionRequest { Title = "Under 19.5", Command = "under" } }
+                Options =
+                [
+                    new() { Title = "Over 19.5", Command = "over" },
+                    new() { Title = "Under 19.5", Command = "under" }
+                ]
             });
         }
     }

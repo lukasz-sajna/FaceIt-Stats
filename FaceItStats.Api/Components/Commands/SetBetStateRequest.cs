@@ -1,13 +1,8 @@
 ﻿using MediatR;
 namespace FaceItStats.Api.Components.Commands
 {
-    public class SetBetStateRequest : IRequest
+    public class SetBetStateRequest(bool isEnabled) : IRequest
     {
-        public SetBetStateRequest(bool isEnabled)
-        {
-            IsEnabled = isEnabled;
-        }
-
-        public bool IsEnabled { get; }
+        public bool IsEnabled { get; } = isEnabled;
     }
 }

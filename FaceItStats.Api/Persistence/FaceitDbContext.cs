@@ -1,12 +1,9 @@
 ﻿using FaceItStats.Api.Persistence.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Persistence
 {
-    public class FaceitDbContext : DbContext
+    public class FaceitDbContext(DbContextOptions<FaceitDbContext> options) : DbContext(options)
     {
         public DbSet<FaceitWebhookData> FaceitWebhookData { get; set; }
 
@@ -14,12 +11,7 @@ namespace FaceItStats.Api.Persistence
 
         public DbSet<BetsSettings> BetsSettings { get; set; }
 
-        public DbSet<ChallangeStats> ChallangeStats { get; set;}
-
-        public FaceitDbContext(DbContextOptions<FaceitDbContext> options) : base(options)
-        {
-
-        }
+        public DbSet<ChallengeStats> ChallengeStats { get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,11 +20,6 @@ namespace FaceItStats.Api.Persistence
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite(Const.ConnectionString);
-        }
-
-        internal Task FirstOrDefaultAsync(CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
         }
     }
 

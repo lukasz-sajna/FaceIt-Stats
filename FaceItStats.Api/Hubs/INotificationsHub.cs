@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Hubs
 {
-    interface INotificationsHub
+    internal interface INotificationsHub
     {
         Task SendNotificationAsync(string method, object data, CancellationToken cancellationToken);
     }

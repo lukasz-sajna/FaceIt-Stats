@@ -10,7 +10,7 @@ namespace FaceItStats.Api.Persistence.Models
         [Key]
         public int Id { get; set; }
 
-        public string Content { get; set; }
+        public string Content { get; private set; }
 
         public FaceitWebhookData()
         {
@@ -19,7 +19,7 @@ namespace FaceItStats.Api.Persistence.Models
 
         public FaceitWebhookData(string content)
         {
-            this.Content = content;
+            Content = content;
         }
     }
 }

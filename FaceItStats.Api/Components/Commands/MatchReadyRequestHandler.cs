@@ -7,29 +7,16 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Components.Commands
 {
-    public class MatchReadyRequestHandler : IRequestHandler<MatchReadyRequest>
+    public class MatchReadyRequestHandler(FaceitDbContext faceItDbContext) : IRequestHandler<MatchReadyRequest>
     {
-        private readonly FaceitDbContext _faceItDbContext;
-
-        public MatchReadyRequestHandler(FaceitDbContext faceItDbContext)
+        public async Task Handle(MatchReadyRequest request, CancellationToken cancellationToken)
         {
-            _faceItDbContext = faceItDbContext;
-        }
-
-        public async Task<Unit> Handle(MatchReadyRequest request, CancellationToken cancellationToken)
-        {
-            var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(request.MatchId));
-
-            if (matchResult == null)
-            {
-                matchResult = new MatchResult(request.MatchId);
-            }
+            var matchResult = faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(request.MatchId)) ??
+                              new MatchResult(request.MatchId);
 
             matchResult.MarkAsStarted();
 
-            await _faceItDbContext.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
+            await faceItDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

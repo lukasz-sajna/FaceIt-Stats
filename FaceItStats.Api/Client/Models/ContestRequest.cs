@@ -1,9 +1,9 @@
-﻿namespace FaceItStats.Api.Models
-{
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
 
-    public class ContenstRequest
+namespace FaceItStats.Api.Client.Models
+{
+    public class ContestRequest
     {
         [JsonProperty("title")]
         public string Title { get; set; }

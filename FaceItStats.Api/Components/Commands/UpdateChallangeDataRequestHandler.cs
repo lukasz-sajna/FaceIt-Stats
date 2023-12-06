@@ -1,44 +1,29 @@
 ﻿namespace FaceItStats.Api.Components.Commands
 {
-    using FaceItStats.Api.Hubs;
-    using FaceItStats.Api.Persistence;
+    using Hubs;
+    using Persistence;
     using MediatR;
     using Microsoft.AspNetCore.SignalR;
     using Microsoft.EntityFrameworkCore;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class UpdateChallangeDataRequestHandler : IRequestHandler<UpdateChallangeDataRequest>
+    public class UpdateChallengeDataRequestHandler(FaceitDbContext dbContext, IHubContext<NotificationsHub> hubContext)
+        : IRequestHandler<UpdateChallengeDataRequest>
     {
-        private readonly FaceitDbContext dbContext;
-        private readonly IHubContext<NotificationsHub> hubContext;
-
-        public UpdateChallangeDataRequestHandler(FaceitDbContext dbContext, IHubContext<NotificationsHub> hubContext)
+        public async Task Handle(UpdateChallengeDataRequest request, CancellationToken cancellationToken)
         {
-            this.dbContext = dbContext;
-            this.hubContext = hubContext;
-        }
+            var statsRow = await dbContext.ChallengeStats.FirstOrDefaultAsync(cancellationToken) ?? new Persistence.Models.ChallengeStats();
 
-        public async Task<Unit> Handle(UpdateChallangeDataRequest request, CancellationToken cancellationToken)
-        {
-            var statsRow = await dbContext.ChallangeStats.FirstOrDefaultAsync(cancellationToken);
+            statsRow.Rank = request.Challenge.Rank;
+            statsRow.Wins = request.Challenge.Wins;
+            statsRow.Draws = request.Challenge.Draws;
+            statsRow.Loses = request.Challenge.Loses;
 
-            if(statsRow == null)
-            {
-                statsRow = new Persistence.Models.ChallangeStats();
-            }
-
-            statsRow.Rank = request.challange.Rank;
-            statsRow.Wins = request.challange.Wins;
-            statsRow.Draws = request.challange.Draws;
-            statsRow.Loses = request.challange.Loses;
-
-            dbContext.ChallangeStats.Update(statsRow);
+            dbContext.ChallengeStats.Update(statsRow);
             await dbContext.SaveChangesAsync(cancellationToken);
 
-            await this.hubContext.Clients.All.SendAsync("challangeStats", request.challange, cancellationToken);
-
-            return Unit.Value;
+            await hubContext.Clients.All.SendAsync("challengeStats", request.Challenge, cancellationToken);
 
         }
     }

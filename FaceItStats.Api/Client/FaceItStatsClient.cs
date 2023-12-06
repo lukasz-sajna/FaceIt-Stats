@@ -1,7 +1,7 @@
 ﻿namespace FaceItStats.Api.Client
 {
-    using FaceItStats.Api.Client.Models;
-    using FaceItStats.Api.Configs;
+    using Models;
+    using Configs;
     using FaceItStats.Api.Models;
     using Newtonsoft.Json;
     using RestSharp;
@@ -9,78 +9,71 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class FaceItStatsClient
+    public class FaceItStatsClient(ThirdPartyApis thirdPartyApis)
     {
-        private readonly ThirdPartyApis _thirdPartyApis;
-
-        public FaceItStatsClient(ThirdPartyApis thirdPartyApis)
+        public Task<FaceItResponse> GetStatsForNickname(string nickname, CancellationToken cancellationToken)
         {
-            _thirdPartyApis = thirdPartyApis;
+            var client = new RestClient(thirdPartyApis.SatontApi.Url);
+
+            return client.GetAsync<FaceItResponse>(new RestRequest($"faceit?nick={nickname}&game=cs2&timezone=Europe%2FWarsaw"), cancellationToken);
         }
 
-        public async Task<FaceItResponse> GetStatsForNickname(string nickname, CancellationToken cancellationToken)
-        {
-            var client = new RestClient(_thirdPartyApis.satontApi.Url);
-
-            return await client.GetAsync<FaceItResponse>(new RestRequest($"faceit?nick={nickname}&game=csgo&timezone=Europe%2FWarsaw", (Method)DataFormat.Json), cancellationToken);
-        }
-
-        public async Task<FaceItResponse> GetLadderInfoForNickname(string nickname)
+        public Task<FaceItResponse> GetLadderInfoForNickname(string nickname)
         {
             var client = new RestClient("http://api.faceit.myhosting.info:81/");
 
-            return await client.GetAsync<FaceItResponse>(new RestRequest($"?n={nickname}", (Method)DataFormat.Json));
+            return client.GetAsync<FaceItResponse>(new RestRequest($"?n={nickname}"));
         }
 
         public async Task<FaceItUserResponse> GetUserInfoForNickname(string nickname, CancellationToken cancellationToken)
         {
-            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/players")
-            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
+            var client = new RestClient($"{thirdPartyApis.FaceItApi.Url}/v4/players")
+            .AddDefaultHeader("Authorization", $"Bearer {thirdPartyApis.FaceItApi.Token}");
 
-            var response = await client.ExecuteAsync(new RestRequest($"?nickname={nickname}&game=csgo", (Method)DataFormat.Json), Method.Get, cancellationToken);
+            var response = await client.ExecuteAsync(new RestRequest($"?nickname={nickname}&game=cs2"), Method.Get, cancellationToken);
 
-            return JsonConvert.DeserializeObject<FaceItUserResponse>(response.Content);
+            return response.Content is not null ? JsonConvert.DeserializeObject<FaceItUserResponse>(response.Content) : new FaceItUserResponse();
         }
 
-        public async Task<MatchDetails> GetMatchDetails(string matchId, CancellationToken cancellationToken)
+        public Task<MatchDetails> GetMatchDetails(string matchId, CancellationToken cancellationToken)
         {
-            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/matches")
-            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
+            var client = new RestClient($"{thirdPartyApis.FaceItApi.Url}/v4/matches")
+            .AddDefaultHeader("Authorization", $"Bearer {thirdPartyApis.FaceItApi.Token}");
 
-            return await client.GetAsync<MatchDetails>(new RestRequest($"/{matchId}", (Method)DataFormat.Json), cancellationToken);
+            return client.GetAsync<MatchDetails>(new RestRequest($"/{matchId}"), cancellationToken);
         }
 
 
         public async Task<MatchStatistics> GetStatisticOfMatch(string matchId, CancellationToken cancellationToken)
         {
-            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/matches")
-            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
+            var client = new RestClient($"{thirdPartyApis.FaceItApi.Url}/v4/matches")
+            .AddDefaultHeader("Authorization", $"Bearer {thirdPartyApis.FaceItApi.Token}");
 
-            var response = await client.ExecuteAsync(new RestRequest($"/{matchId}/stats", (Method)DataFormat.Json), Method.Get, cancellationToken);
+            var response = await client.ExecuteAsync(new RestRequest($"/{matchId}/stats"), Method.Get, cancellationToken);
 
-            return JsonConvert.DeserializeObject<MatchStatistics>(response.Content);
+            return response.Content is not null ? JsonConvert.DeserializeObject<MatchStatistics>(response.Content) : new MatchStatistics();
         }
 
         public async Task<PlayerMatchHistory> GetPlayerMatchHistory(string playerId, int limit, CancellationToken cancellationToken)
         {
-            var client = new RestClient($"{_thirdPartyApis.faceItApi.Url}/v4/players")
-            .AddDefaultHeader("Authorization", $"Bearer {_thirdPartyApis.faceItApi.Token}");
+            var client = new RestClient($"{thirdPartyApis.FaceItApi.Url}/v4/players")
+            .AddDefaultHeader("Authorization", $"Bearer {thirdPartyApis.FaceItApi.Token}");
 
-            var response = await client.ExecuteAsync(new RestRequest($"/{playerId}/history?game=csgo&offset=0&limit={limit}", (Method)DataFormat.Json), Method.Get, cancellationToken);
+            var response = await client.ExecuteAsync(new RestRequest($"/{playerId}/history?game=cs2&offset=0&limit={limit}"), Method.Get, cancellationToken);
 
-            return JsonConvert.DeserializeObject<PlayerMatchHistory>(response.Content);
+            return response.Content is not null ? JsonConvert.DeserializeObject<PlayerMatchHistory>(response.Content) : new PlayerMatchHistory();
         }
 
         public async Task<List<PlayerMatchEloHistory>> GetPlayerMatchEloHistory(string playerId, int limit, CancellationToken cancellationToken)
         {
             var client = new RestClient("https://api.faceit.com/stats/v1/stats/time/users");
-            var request = new RestRequest($"/{playerId}/games/csgo?page=0&size={limit}", Method.Get);
+            var request = new RestRequest($"/{playerId}/games/cs2?page=0&size={limit}");
             request.AddOrUpdateHeader("Accept", "*/*");
             request.AddOrUpdateHeader("Host", "api.faceit.com");
 
             var response = await client.ExecuteAsync(request, cancellationToken);
 
-            return JsonConvert.DeserializeObject<List<PlayerMatchEloHistory>>(response.Content);
+            return response.Content is not null ? JsonConvert.DeserializeObject<List<PlayerMatchEloHistory>>(response.Content) : new List<PlayerMatchEloHistory>();
         }
     }
 }

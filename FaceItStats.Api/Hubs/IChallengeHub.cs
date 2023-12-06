@@ -1,6 +1,6 @@
 ﻿namespace FaceItStats.Api.Hubs
 {
-    internal interface IChallangeHub
+    internal interface IChallengeHub
     {
     }
 }

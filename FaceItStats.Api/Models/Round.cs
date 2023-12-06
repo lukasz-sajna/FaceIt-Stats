@@ -1,7 +1,7 @@
 ﻿namespace FaceItStats.Api.Models
 {
     using System.Collections.Generic;
-    using FaceItStats.Api.Helpers;
+    using Helpers;
     using Newtonsoft.Json;
 
     public class Round

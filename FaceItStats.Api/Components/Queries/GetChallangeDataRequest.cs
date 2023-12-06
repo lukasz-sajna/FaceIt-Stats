@@ -1,32 +1,26 @@
 ﻿namespace FaceItStats.Api.Components.Queries
 {
-    using FaceItStats.Api.Models;
-    using FaceItStats.Api.Persistence;
+    using Models;
+    using Persistence;
     using MediatR;
     using Microsoft.EntityFrameworkCore;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class GetChallangeDataRequest : IRequest<ChallangeData>
+    public class GetChallengeDataRequest : IRequest<ChallengeData>
     {
     }
 
-    public class GetChallangeDataHandler : IRequestHandler<GetChallangeDataRequest, ChallangeData>
+    public class GetChallengeDataHandler(FaceitDbContext context)
+        : IRequestHandler<GetChallengeDataRequest, ChallengeData>
     {
-        private readonly FaceitDbContext dbContext;
-
-        public GetChallangeDataHandler(FaceitDbContext dbContext)
+        public async Task<ChallengeData> Handle(GetChallengeDataRequest request, CancellationToken cancellationToken)
         {
-            this.dbContext = dbContext;
-        }
+            var statsRow = await context.ChallengeStats.FirstOrDefaultAsync(cancellationToken);
 
-        public async Task<ChallangeData> Handle(GetChallangeDataRequest request, CancellationToken cancellationToken)
-        {
-            var statsRow = await this.dbContext.ChallangeStats.FirstOrDefaultAsync(cancellationToken);
-
-            if (statsRow == null)
+            if (statsRow is null)
             {
-                statsRow = new Persistence.Models.ChallangeStats
+                statsRow = new Persistence.Models.ChallengeStats
                 {
                     Rank = 0,
                     Wins = 0,
@@ -34,11 +28,11 @@
                     Loses = 0
                 };
 
-                dbContext.ChallangeStats.Add(statsRow);
-                await dbContext.SaveChangesAsync(cancellationToken);
+                context.ChallengeStats.Add(statsRow);
+                await context.SaveChangesAsync(cancellationToken);
             }
 
-            return new ChallangeData(statsRow.Rank, statsRow.Wins, statsRow.Draws, statsRow.Loses);
+            return new ChallengeData(statsRow.Rank, statsRow.Wins, statsRow.Draws, statsRow.Loses);
         }
     }
 }

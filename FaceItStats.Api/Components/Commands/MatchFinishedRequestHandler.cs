@@ -8,7 +8,6 @@ using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using System;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
@@ -16,25 +15,22 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Components.Commands
 {
-    public class MatchFinishedRequestHandler : IRequestHandler<MatchFinishedRequest>
+    public class MatchFinishedRequestHandler(
+        FaceitDbContext faceItDbContext,
+        IOptions<Auth> authSettings,
+        IHubContext<NotificationsHub> hubContext,
+        IOptions<ThirdPartyApis> thirdPartyApisOptions)
+        : IRequestHandler<MatchFinishedRequest>
     {
-        private readonly SeClient _seClient;
-        private readonly FaceitDbContext _faceItDbContext;
-        private readonly FaceItStatsClient _faceItClient;
+        private readonly SeClient _seClient = SeClient.CreateInstance(authSettings.Value.SeToken, hubContext);
+        private readonly FaceItStatsClient _faceItClient = new(thirdPartyApisOptions.Value);
 
-        public MatchFinishedRequestHandler(FaceitDbContext faceItDbContext, IOptions<Auth> authSettings, IHubContext<NotificationsHub> hubContext, IOptions<ThirdPartyApis> thirdPartyApisOptions)
+        public async Task Handle(MatchFinishedRequest request, CancellationToken cancellationToken)
         {
-            _faceItDbContext = faceItDbContext;
-            _seClient = new SeClient(authSettings.Value.SeToken, hubContext);
-            _faceItClient = new FaceItStatsClient(thirdPartyApisOptions.Value);
-        }
-
-        public async Task<Unit> Handle(MatchFinishedRequest request, CancellationToken cancellationToken)
-        {
-            var betSettings = await _faceItDbContext.BetsSettings.FirstOrDefaultAsync(cancellationToken);
+            var betSettings = await faceItDbContext.BetsSettings.FirstOrDefaultAsync(cancellationToken);
             var isBetsEnabled = betSettings != null && betSettings.IsEnabled;
 
-            var matchResult = _faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(request.MatchId));
+            var matchResult = faceItDbContext.MatchResult.FirstOrDefault(x => x.MatchId.Equals(request.MatchId));
             if (matchResult != null)
             {
                 var user = await _faceItClient.GetUserInfoForNickname("luciusxsein", cancellationToken);
@@ -45,12 +41,12 @@ namespace FaceItStats.Api.Components.Commands
                 var isWin = matchDetails.Results.Winner.Equals(myFaction);
 
                 var matchStats = await _faceItClient.GetStatisticOfMatch(matchResult.MatchId, cancellationToken);
-                var myScore = matchStats.Rounds.FirstOrDefault()
+                var myScore = matchStats.Rounds.FirstOrDefault()!
                     .Teams.FirstOrDefault(x => x.Players.Any(x => x.PlayerId.ToString().Equals(userId)))
                     .Players.FirstOrDefault(x => x.PlayerId.ToString().Equals(userId))
                     .PlayerStats;
 
-                matchResult.AddResult(isWin, (int)myScore.Kills, decimal.Parse(myScore.KDRatio, CultureInfo.InvariantCulture));
+                matchResult.AddResult(isWin, (int)myScore.Kills, decimal.Parse(myScore.KdRatio, CultureInfo.InvariantCulture));
                 matchResult.MarkAsFinished();
 
                 if (isBetsEnabled || matchResult.ContestId != null)
@@ -61,9 +57,7 @@ namespace FaceItStats.Api.Components.Commands
                 }
             }
 
-            await _faceItDbContext.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
+            await faceItDbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task<string> GetWinnerOptionAsync(MatchResult result)

@@ -1,5 +1,4 @@
 ﻿using FaceItStats.Api.Helpers;
-using FaceItStats.Api.Middleware;
 using Hangfire;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -23,23 +22,6 @@ namespace FaceItStats.Api.Extensions
             ServiceCollectionExtensions.MigrateStatisticsDb(serviceScope.ServiceProvider);
 
             return app;
-        }
-
-        public static void UseHangfire(this IApplicationBuilder app)
-        {
-            var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope();
-
-            app.UseHangfireServer(new BackgroundJobServerOptions
-            {
-                Activator = new DependencyJobActivator(serviceScope.ServiceProvider),
-                WorkerCount = Environment.ProcessorCount * 5,
-                Queues = new[] { Queues.Bets }
-            });
-
-            GlobalConfiguration.Configuration.UseSerializerSettings(new JsonSerializerSettings
-            { TypeNameHandling = TypeNameHandling.Objects });
-
-            HangFireHelpers.Mediator = serviceScope.ServiceProvider.GetService<IMediator>();
         }
     }
 }

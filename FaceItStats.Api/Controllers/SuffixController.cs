@@ -1,6 +1,6 @@
 ﻿namespace FaceItStats.Api.Controllers
 {
-    using FaceItStats.Api.Components.Queries;
+    using Components.Queries;
     using MediatR;
     using Microsoft.AspNetCore.Mvc;
     using System.Threading;
@@ -8,19 +8,12 @@
 
     [Route("api/[controller]")]
     [ApiController]
-    public class SuffixController : ControllerBase
+    public class SuffixController(ISender mediator) : ControllerBase
     {
-        private readonly IMediator _mediator;
-
-        public SuffixController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
-
         [HttpGet]
         public async Task<IActionResult> GetSuffix(int counter, CancellationToken cancellationToken)
         {
-            return Ok(await _mediator.Send(new GetSuffixRequest(counter), cancellationToken));
+            return Ok(await mediator.Send(new GetSuffixRequest(counter), cancellationToken));
         }
     }
 }

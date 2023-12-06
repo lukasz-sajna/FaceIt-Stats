@@ -2,14 +2,9 @@
 
 namespace FaceItStats.Api.Client.Models
 {
-    public class Winner
+    public class Winner(string winnerId)
     {
-        public Winner(string winnerId)
-        {
-            WinnerId = winnerId;
-        }
-
         [JsonProperty("winnerId")]
-        public string WinnerId { get; }
+        public string WinnerId { get; } = winnerId;
     }
 }
