@@ -1,4 +1,4 @@
 ﻿namespace FaceItStats.Api.Models
 {
-    public enum Game { Csgo, Free };
+    public enum Game { Cs2, Free };
 }
