@@ -3,26 +3,20 @@ using FaceItStats.Api.Extensions;
 using FaceItStats.Api.Hubs;
 using Hangfire;
 using Hangfire.Storage.SQLite;
-using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace FaceItStats.Api
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; } = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -32,8 +26,8 @@ namespace FaceItStats.Api
              options.UseCamelCasing(true)
              );
             services.ConfigureSwagger();
-            services.AddSignalR();
-            services.AddMediatR(typeof(Startup));
+            services.ConfigureSignalR();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
             services.AddCors(options =>
             {
                 options.AddPolicy(Const.DefaultCorsPolicy, corsBuilder => corsBuilder
@@ -42,14 +36,19 @@ namespace FaceItStats.Api
                 );
             });
             services.Configure<ExcludedCompetitions>(Configuration.GetSection(nameof(ExcludedCompetitions)));
-            services.AddHangfire(configuration =>
-            {
-                configuration.UseSimpleAssemblyNameTypeSerializer();
-                configuration.UseRecommendedSerializerSettings();
-                configuration.UseSQLiteStorage(Const.HangfireConnectionString);
-                configuration.UseMediatR();
-            }
+            services.AddHangfire(globalConfiguration =>
+                {
+                    globalConfiguration.SetDataCompatibilityLevel(CompatibilityLevel.Version_180);
+                    globalConfiguration.UseSimpleAssemblyNameTypeSerializer();
+                    globalConfiguration.UseRecommendedSerializerSettings();
+                    globalConfiguration.UseSQLiteStorage(Const.HangfireConnectionString);
+                    globalConfiguration.UseMediatR();
+                }
             );
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
+
             services.Configure<Auth>(Configuration.GetSection(nameof(Auth)));
             services.Configure<ThirdPartyApis>(Configuration.GetSection(nameof(ThirdPartyApis)));
         }
@@ -76,16 +75,16 @@ namespace FaceItStats.Api
             app.UpdateDatabase();
             app.UseCustomSwagger();
             app.UseHttpsRedirection();
-            app.UseHangfire();
             app.UseRouting();
 
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
+                endpoints.MapHangfireDashboard();
                 endpoints.MapHub<FaceItStatsHub>($"{Const.SignalRHubsPathRoot}/faceitStats");
                 endpoints.MapHub<NotificationsHub>($"{Const.SignalRHubsPathRoot}/notifications");
-                endpoints.MapHub<ChallangeHub>($"{Const.SignalRHubsPathRoot}/challangeStats");
+                endpoints.MapHub<ChallengeHub>($"{Const.SignalRHubsPathRoot}/challengeStats");
             });
         }
     }

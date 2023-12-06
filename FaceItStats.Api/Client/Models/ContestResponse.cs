@@ -1,10 +1,10 @@
-﻿namespace FaceItStats.Api.Models
-{
-    using System;
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 
-    public class ContenstResponse
+namespace FaceItStats.Api.Client.Models
+{
+    public class ContestResponse
     {
         [JsonProperty("botResponses")]
         public bool BotResponses { get; set; }

@@ -1,6 +1,6 @@
 ﻿namespace FaceItStats.Api.Client.Models
 {
-    using FaceItStats.Api.Helpers;
+    using Helpers;
     using Newtonsoft.Json;
 
     public class PlayerMatchEloHistory

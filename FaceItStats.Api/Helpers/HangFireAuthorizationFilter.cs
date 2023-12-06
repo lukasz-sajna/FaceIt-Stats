@@ -1,5 +1,4 @@
-﻿using System;
-using Hangfire.Dashboard;
+﻿using Hangfire.Dashboard;
 
 namespace FaceItStats.Api.Helpers
 {

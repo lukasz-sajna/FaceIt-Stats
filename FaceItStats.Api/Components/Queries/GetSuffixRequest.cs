@@ -2,13 +2,8 @@
 {
     using MediatR;
 
-    public class GetSuffixRequest : IRequest<string>
+    public class GetSuffixRequest(int counter) : IRequest<string>
     {
-        public GetSuffixRequest(int counter)
-        {
-            Counter = counter;
-        }
-
-        public int Counter { get; }
+        public int Counter { get; } = counter;
     }
 }

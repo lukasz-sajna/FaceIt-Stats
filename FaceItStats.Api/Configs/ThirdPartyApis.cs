@@ -2,9 +2,9 @@
 {
     public class ThirdPartyApis
     {
-        public SatontApi satontApi { get; set; }
+        public SatontApi SatontApi { get; set; }
 
-        public FaceItApi faceItApi { get; set; }
+        public FaceItApi FaceItApi { get; set; }
     }
 
     public class SatontApi

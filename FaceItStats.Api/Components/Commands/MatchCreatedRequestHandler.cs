@@ -13,25 +13,22 @@ using System.Threading.Tasks;
 
 namespace FaceItStats.Api.Components.Commands
 {
-    public class MatchCreatedRequestHandler : IRequestHandler<MatchCreatedRequest>
+    public class MatchCreatedRequestHandler(
+        FaceitDbContext faceItDbContext,
+        IOptions<Auth> authSettings,
+        IHubContext<NotificationsHub> hubContext)
+        : IRequestHandler<MatchCreatedRequest>
     {
-        private readonly SeClient _seClient;
-        private readonly FaceitDbContext _faceItDbContext;
+        private readonly SeClient _seClient = SeClient.CreateInstance(authSettings.Value.SeToken, hubContext);
 
-        public MatchCreatedRequestHandler(FaceitDbContext faceItDbContext, IOptions<Auth> authSettings, IHubContext<NotificationsHub> hubContext)
+        public async Task Handle(MatchCreatedRequest request, CancellationToken cancellationToken)
         {
-            _faceItDbContext = faceItDbContext;
-            _seClient = new SeClient(authSettings.Value.SeToken, hubContext);
-        }
-
-        public async Task<Unit> Handle(MatchCreatedRequest request, CancellationToken cancellationToken)
-        {
-            var betSettings = await _faceItDbContext.BetsSettings.FirstOrDefaultAsync(cancellationToken);
+            var betSettings = await faceItDbContext.BetsSettings.FirstOrDefaultAsync(cancellationToken);
             var isBetsEnabled = betSettings != null && betSettings.IsEnabled;
 
             var matchResult = new MatchResult(request.MatchId);
 
-            _faceItDbContext.Add(matchResult);
+            faceItDbContext.Add(matchResult);
 
             if (isBetsEnabled)
             {
@@ -41,9 +38,7 @@ namespace FaceItStats.Api.Components.Commands
                 matchResult.SetContest(contest.Id, contest.Options.First().Id, contest.Options.Last().Id);
             }
 
-            await _faceItDbContext.SaveChangesAsync(cancellationToken);
-
-            return Unit.Value;
+            await faceItDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

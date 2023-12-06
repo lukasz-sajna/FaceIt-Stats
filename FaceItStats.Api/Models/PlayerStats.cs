@@ -1,6 +1,6 @@
 ﻿namespace FaceItStats.Api.Models
 {
-    using FaceItStats.Api.Helpers;
+    using Helpers;
     using Newtonsoft.Json;
 
     public class PlayerStats
@@ -9,7 +9,6 @@
         [JsonConverter(typeof(ParseStringConverter))]
         public long QuadroKills { get; set; }
 
-        [JsonProperty("Headshots")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Headshots { get; set; }
 
@@ -21,11 +20,9 @@
         [JsonConverter(typeof(ParseStringConverter))]
         public long TripleKills { get; set; }
 
-        [JsonProperty("Kills")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Kills { get; set; }
 
-        [JsonProperty("Assists")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Assists { get; set; }
 
@@ -38,17 +35,15 @@
         public long MvPs { get; set; }
 
         [JsonProperty("K/R Ratio")]
-        public string KRRatio { get; set; }
+        public string KrRatio { get; set; }
 
-        [JsonProperty("Result")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Result { get; set; }
 
-        [JsonProperty("Deaths")]
         [JsonConverter(typeof(ParseStringConverter))]
         public long Deaths { get; set; }
 
         [JsonProperty("K/D Ratio")]
-        public string KDRatio { get; set; }
+        public string KdRatio { get; set; }
     }
 }

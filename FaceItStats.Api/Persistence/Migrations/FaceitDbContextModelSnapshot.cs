@@ -30,7 +30,7 @@ namespace FaceItStats.Api.Persistence.Migrations
                     b.ToTable("BetsSettings");
                 });
 
-            modelBuilder.Entity("FaceItStats.Api.Persistence.Models.ChallangeStats", b =>
+            modelBuilder.Entity("FaceItStats.Api.Persistence.Models.ChallengeStats", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -50,7 +50,7 @@ namespace FaceItStats.Api.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChallangeStats");
+                    b.ToTable("ChallengeStats");
                 });
 
             modelBuilder.Entity("FaceItStats.Api.Persistence.Models.FaceitWebhookData", b =>

@@ -26,9 +26,14 @@ namespace FaceItStats.Api.Client.Models
 
         [JsonProperty("stats")]
         public Stats Stats { get; set; }
-        public string ladder { get; set; }
-        public string report { get; set; }
-        public string trend { get; set; }
-        public string last_match { get; set; }
+
+        public string Ladder { get; set; }
+
+        public string Report { get; set; }
+
+        public string Trend { get; set; }
+
+        [JsonProperty("last_match")]
+        public string LastMatch { get; set; }
     }
 }
